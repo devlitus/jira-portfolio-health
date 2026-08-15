@@ -165,10 +165,10 @@ Tarea grande — subtareas:
 
 ### Tarea 2.3 — Métricas de Scope (§11)
 
-- [ ] `currentScope = totalIssues` (o suma de story points si existen — decidir: issues para MVP).
-- [ ] `scopeGrowthPercent = (currentScope - baselineScope) / baselineScope * 100`.
-- [ ] Baseline = primer snapshot almacenado por la app (§11 "cuando no exista baseline formal"). Función `getBaseline(projectKey)` en `src/storage/snapshotStore.js` (stub en esta fase, se completa en Fase 5; en Fase 2 el baseline se recibe como parámetro).
-- **DoD:** tests: 0%, +10%, +30%, sin baseline (→ `null`).
+- [x] `currentScope = totalIssues` (o suma de story points si existen — decidir: issues para MVP). → `src/metrics/scope.ts`, `computeScopeMetrics()`.
+- [x] `scopeGrowthPercent = (currentScope - baselineScope) / baselineScope * 100`. → `null` si no hay baseline o si `baselineScope === 0` (evita `Infinity`).
+- [x] Baseline = primer snapshot almacenado por la app (§11 "cuando no exista baseline formal"). Función `getBaseline(projectKey)` en `src/storage/snapshotStore.js` (stub en esta fase, se completa en Fase 5; en Fase 2 el baseline se recibe como parámetro). → `src/storage/snapshotStore.ts` (convención `.ts` del repo), stub que resuelve `null`; `computeScopeMetrics()` recibe `baselineScope` como parámetro, no llama al store.
+- **DoD:** tests: 0%, +10%, +30%, sin baseline (→ `null`). → `__tests__/scopeMetrics.test.ts` (5 tests) + `__tests__/snapshotStore.test.ts` (stub); `npm test` (41/41), `npm run lint` y `tsc --noEmit` en verde.
 
 ### Tarea 2.4 — Métricas de Capacity (§12)
 
