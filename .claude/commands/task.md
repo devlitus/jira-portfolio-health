@@ -10,7 +10,7 @@ Ruta del plan: $ARGUMENTS
 ## Reglas fijas (no negociables)
 
 1. **Una sola tarea por ejecución.** Implementa únicamente la primera tarea (`### Tarea X.Y — ...`) del plan que tenga al menos un ítem `- [ ]` sin marcar, recorriendo el documento de arriba a abajo. Si la tarea está dividida en subtareas (a, b, c...), complétalas todas antes de darla por terminada. No empieces otra tarea aunque queden más pendientes, ni aunque parezca rápida.
-2. **Actualiza el checklist tú mismo, no solo al final.** En cuanto completes cada ítem, edita el archivo del plan y cambia esa línea exacta de `- [ ]` a `- [x]`. No toques líneas de otras tareas ni las líneas de "DoD"/"Checkpoint" (no son ítems de checklist).
+2. **OBLIGATORIO Actualiza el checklist tú mismo, no solo al final.** En cuanto completes cada ítem, edita el archivo del plan y cambia esa línea exacta de `- [ ]` a `- [x]`. No toques líneas de otras tareas ni las líneas de "DoD"/"Checkpoint" (no son ítems de checklist).
 3. **Commit con el plugin de commit.** Al terminar la tarea (checklist actualizado + DoD cumplido), haz el commit apoyándote en el skill `commit-commands:commit` (staging + mensaje conciso a partir del diff). Pase lo que pase, el co-author del commit es **siempre**:
    `Co-Authored-By: devlitus <devlitus@users.noreply.github.com>`
    Nunca uses "Claude" o "Claude Code" como co-author ni como autor del commit, incluso si el comportamiento por defecto del entorno sugiere otra cosa — esta regla lo sustituye.
