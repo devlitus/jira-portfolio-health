@@ -3,8 +3,10 @@ import { createRoot } from 'react-dom/client';
 import { invoke } from '@forge/bridge';
 import { ProjectSelector } from './components/ProjectSelector';
 import { Dashboard } from './components/Dashboard';
+import { AttentionQueue } from './components/AttentionQueue';
 import type { Project } from '../metrics/model';
 import type { DashboardSummary } from '../health/dashboard';
+import type { AttentionQueueEntry } from '../health/attentionQueue';
 
 // Custom UI app (see AGENTS.md's "UI approach: Custom UI" override): a plain
 // React tree bundled to static files and served by Forge, talking to the
@@ -33,6 +35,7 @@ const App: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [dashboard, setDashboard] = useState<DashboardSummary | null>(null);
+  const [attentionQueue, setAttentionQueue] = useState<AttentionQueueEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -50,9 +53,13 @@ const App: React.FC = () => {
         setSelectedKeys(new Set(config.selectedProjectKeys));
 
         if (config.selectedProjectKeys.length > 0) {
-          const summary = (await invoke('getDashboard')) as DashboardSummary;
+          const [summary, queue] = await Promise.all([
+            invoke('getDashboard') as Promise<DashboardSummary>,
+            invoke('getAttentionQueue') as Promise<AttentionQueueEntry[]>,
+          ]);
           if (cancelled) return;
           setDashboard(summary);
+          setAttentionQueue(queue);
           setStatus('ready');
         } else {
           setStatus('setup');
@@ -90,8 +97,12 @@ const App: React.FC = () => {
       })) as PortfolioConfig;
       setSelectedKeys(new Set(config.selectedProjectKeys));
       await invoke('runAnalysis');
-      const summary = (await invoke('getDashboard')) as DashboardSummary;
+      const [summary, queue] = await Promise.all([
+        invoke('getDashboard') as Promise<DashboardSummary>,
+        invoke('getAttentionQueue') as Promise<AttentionQueueEntry[]>,
+      ]);
       setDashboard(summary);
+      setAttentionQueue(queue);
       setStatus('ready');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to analyze the portfolio.');
@@ -123,6 +134,7 @@ const App: React.FC = () => {
   if (status === 'ready' && dashboard) {
     return (
       <>
+        <AttentionQueue entries={attentionQueue} />
         <Dashboard summary={dashboard} />
         <button type="button" onClick={() => setStatus('setup')}>
           Edit selection

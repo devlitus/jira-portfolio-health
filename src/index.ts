@@ -12,7 +12,9 @@ import type { Project } from './metrics/model';
 import { analyzeProject } from './health/analyzeProject';
 import type { ProjectAnalysisOutcome } from './health/analyzeProject';
 import { buildDashboardSummary } from './health/dashboard';
-import type { DashboardSummary } from './health/dashboard';
+import type { DashboardEntry, DashboardSummary } from './health/dashboard';
+import { buildAttentionQueue } from './health/attentionQueue';
+import type { AttentionQueueEntry } from './health/attentionQueue';
 
 const resolver = new Resolver();
 
@@ -53,26 +55,41 @@ resolver.define('runAnalysis', async (): Promise<ProjectAnalysisOutcome[]> => {
 });
 
 /**
- * Portfolio overview (Tarea 4.1): reads the selected projects' names (Jira,
- * so the dashboard reflects current project names) and their latest cached
- * analysis (KVS `latest:<projectKey>`, written by `runAnalysis`), and
- * reduces them to the dashboard's executive summary — no recomputation, so
- * the dashboard stays fast (§24 Performance).
+ * Reads the selected projects' names (Jira, so the UI reflects current
+ * project names) and their latest cached analysis (KVS `latest:<projectKey>`,
+ * written by `runAnalysis`) — no recomputation, so dashboard-derived views
+ * stay fast (§24 Performance). Shared by `getDashboard` (Tarea 4.1) and
+ * `getAttentionQueue` (Tarea 4.2), which reduce this same data differently.
  */
-resolver.define('getDashboard', async (): Promise<DashboardSummary> => {
+async function loadDashboardEntries(): Promise<DashboardEntry[]> {
   const config = await getConfig();
   const allProjects = await listProjects(asUser());
   const projectsByKey = new Map(allProjects.map((project) => [project.key, project]));
 
-  const entries = await Promise.all(
+  return Promise.all(
     config.selectedProjectKeys.map(async (projectKey) => {
       const project = projectsByKey.get(projectKey) ?? { id: projectKey, key: projectKey, name: projectKey };
       const outcome = await kvs.get<ProjectAnalysisOutcome>(`latest:${projectKey}`);
       return { project, outcome: outcome ?? undefined };
     })
   );
+}
 
-  return buildDashboardSummary(entries);
+/**
+ * Portfolio overview (Tarea 4.1): reduces the selected projects' latest
+ * cached analysis to the dashboard's executive summary.
+ */
+resolver.define('getDashboard', async (): Promise<DashboardSummary> => {
+  return buildDashboardSummary(await loadDashboardEntries());
+});
+
+/**
+ * Attention Queue (Tarea 4.2, §18): the same cached analysis as
+ * `getDashboard`, reduced to the ordered "Today's Attention" queue
+ * (severity DESC, health ASC, recent deterioration DESC).
+ */
+resolver.define('getAttentionQueue', async (): Promise<AttentionQueueEntry[]> => {
+  return buildAttentionQueue(await loadDashboardEntries());
 });
 
 export const handler = resolver.getDefinitions();

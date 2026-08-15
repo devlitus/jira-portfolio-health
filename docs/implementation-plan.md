@@ -272,9 +272,9 @@ Tarea grande — subtareas:
 
 ### Tarea 4.2 — Attention Queue (§18)
 
-- [ ] Resolver `getAttentionQueue`: ordena por severidad DESC → health ASC → deterioro reciente DESC (deterioro: stub 0 hasta Fase 5, orden ya implementado).
-- [ ] Componente `AttentionQueue.jsx`: tarjetas con lozenge de status, health, "Main issue" (factor de mayor impacto) y enlace al detalle.
-- **DoD:** orden verificado con test unitario del criterio de ordenación.
+- [x] Resolver `getAttentionQueue`: ordena por severidad DESC → health ASC → deterioro reciente DESC (deterioro: stub 0 hasta Fase 5, orden ya implementado). → `src/index.ts`, resolver `getAttentionQueue` sobre la función pura `buildAttentionQueue` (`src/health/attentionQueue.ts`); reutiliza el mismo `loadDashboardEntries()` (KVS `latest:*` + nombres de `listProjects`) que `getDashboard` (Tarea 4.1.a), sin recomputar el análisis.
+- [x] Componente `AttentionQueue.jsx`: tarjetas con lozenge de status, health, "Main issue" (factor de mayor impacto) y enlace al detalle. → `src/frontend/components/AttentionQueue.tsx` (Custom UI, no UI Kit — ver Tarea 1.5.c/`CLAUDE.md`): icono de severidad (🔴/🟠/🟢) en vez de `Lozenge`, health, "Main issue" (mensaje del `HealthFactor` de mayor impacto entre las 5 dimensiones) y botón "View details" con callback `onSelectProject` opcional, sin cablear aún a una pantalla de detalle real (Tarea 4.3 aún no existe); montado en `src/frontend/index.tsx` sobre la pantalla "ready", junto a `getAttentionQueue` en la carga inicial y tras `runAnalysis`.
+- **DoD:** orden verificado con test unitario del criterio de ordenación. → `__tests__/attentionQueue.test.ts` (6 tests: severidad DESC, health ASC dentro de la misma severidad, exclusión de proyectos sin análisis/fallidos, "Main issue" por mayor impacto, "Main issue" `null` sin factores, deterioro stub en 0); `npm test` (115/115), `npm run lint`, `tsc --noEmit` y `forge lint` en verde; `npm run build` genera `static/main/bundle.js`; `forge deploy --non-interactive -e development` OK (v5.3.0, sin cambios de scopes → no requiere reinstalar).
 
 ### Tarea 4.3 — Project Detail (§16)
 
