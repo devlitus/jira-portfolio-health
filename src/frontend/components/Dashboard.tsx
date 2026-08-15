@@ -121,7 +121,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         {topAttention.length === 0 ? (
           <p>No projects with a calculated health score yet.</p>
         ) : (
-          <ol>
+          <ol className="flex gap-4">
             {topAttention.map((project) => (
               <TopAttentionItem key={project.projectKey} project={project} />
             ))}

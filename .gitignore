@@ -9,6 +9,7 @@ dist/
 
 # Custom UI build output (regenerate with `npm run build` before `forge deploy`)
 static/main/bundle.js
+static/main/styles.css
 
 # Compiled Java class files
 *.class
