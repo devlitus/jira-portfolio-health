@@ -1,0 +1,16 @@
+modules:
+  jira:globalPage:
+    - key: jira-portfolio-health-global-page-hello-world
+      resource: main
+      title: jira-portfolio-health
+app:
+  runtime:
+    name: nodejs24.x
+    memoryMB: 256
+    architecture: arm64
+  id: ari:cloud:ecosystem::app/2587d230-9c52-4223-8702-a69f913833cf
+resources:
+  - key: main
+    path: static/main
+permissions:
+  scopes: []

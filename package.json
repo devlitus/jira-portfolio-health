@@ -1,0 +1,26 @@
+{
+  "name": "jira-portfolio-health",
+  "version": "2.0.30",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "esbuild src/frontend/index.tsx --bundle --minify --outfile=static/main/bundle.js",
+    "watch": "esbuild src/frontend/index.tsx --bundle --outfile=static/main/bundle.js --watch",
+    "lint": "eslint src/**/*.{ts,tsx}"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@typescript-eslint/eslint-plugin": "^8.67.0",
+    "@typescript-eslint/parser": "^8.67.0",
+    "esbuild": "^0.28.2",
+    "eslint": "^8.56.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "@forge/bridge": "^6.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}
