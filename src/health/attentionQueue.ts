@@ -4,14 +4,13 @@
 //
 //   severity DESC, then health score ASC, then recent deterioration DESC
 //
-// Deterioration requires historical snapshots (Fase 5, Tarea 5.4) and is
-// stubbed at 0 for every entry until then, per the plan's own note on this
-// task — the ordering rule itself is already fully wired, so Tarea 5.4 only
-// needs to supply a real value.
+// Deterioration (Tarea 5.4) is precomputed by the resolver from snapshot
+// history, same as `trend`/`trendLine` (Tarea 5.3) — see `DashboardEntry`.
 
 import { HealthFactor, HealthStatus } from '../metrics/model';
 import { DashboardEntry } from './dashboard';
 import { ProjectAnalysisSuccess } from './analyzeProject';
+import { formatDeterioration } from './trend';
 
 const SEVERITY_RANK: Record<HealthStatus, number> = {
   CRITICAL: 0,
@@ -24,8 +23,10 @@ export interface AttentionQueueEntry {
   projectName: string;
   healthScore: number;
   status: HealthStatus;
-  /** Health score change over the last 14 days; stubbed at 0 until Fase 5 (Tarea 5.4). */
-  deterioration: number;
+  /** Health score change over the last 14 days (§18); negative means the project got worse. Null when there's no ~14-day-old snapshot to compare against. */
+  deterioration: number | null;
+  /** Formatted deterioration line (§18: "↓ -19 in 14 days"); null when `deterioration` is null. */
+  deteriorationLabel: string | null;
   /** The explainable factor with the largest penalty across all dimensions, if any (§18 "Main issue"). */
   mainIssue: string | null;
 }
@@ -45,13 +46,15 @@ function findMainIssue(dimensions: ProjectAnalysisSuccess['dimensions']): string
   return allFactors.reduce((worst, factor) => (factor.impact < worst.impact ? factor : worst)).message;
 }
 
-function toEntry({ project, outcome }: ScoredEntry): AttentionQueueEntry {
+function toEntry({ project, outcome, deterioration }: ScoredEntry): AttentionQueueEntry {
+  const resolvedDeterioration = deterioration ?? null;
   return {
     projectKey: project.key,
     projectName: project.name,
     healthScore: outcome.healthScore,
     status: outcome.status,
-    deterioration: 0,
+    deterioration: resolvedDeterioration,
+    deteriorationLabel: formatDeterioration(resolvedDeterioration),
     mainIssue: findMainIssue(outcome.dimensions),
   };
 }
@@ -73,6 +76,11 @@ export function buildAttentionQueue(entries: DashboardEntry[]): AttentionQueueEn
       const healthDiff = a.healthScore - b.healthScore;
       if (healthDiff !== 0) return healthDiff;
 
-      return b.deterioration - a.deterioration;
+      // "recent deterioration DESC" (§18): the biggest recent drop goes first.
+      // `deterioration` is negative when a project got worse (Tarea 5.4), so
+      // that's ascending order on the signed value, not descending. Unknown
+      // deterioration (no ~14-day-old snapshot) sorts as if unchanged — missing
+      // history isn't evidence of decline (§24 Resilience).
+      return (a.deterioration ?? 0) - (b.deterioration ?? 0);
     });
 }

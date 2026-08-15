@@ -1,6 +1,8 @@
 import {
   buildTrendSeries,
+  computeDeterioration,
   computeTrendDirection,
+  formatDeterioration,
   formatTrendLine,
   TREND_PLACEHOLDER,
 } from '../src/health/trend';
@@ -96,5 +98,53 @@ describe('formatTrendLine (§16 trend line)', () => {
     ];
 
     expect(formatTrendLine(points)).toBe('78 → N/A');
+  });
+});
+
+describe('computeDeterioration (§18 Attention Queue)', () => {
+  it('returns null when there is no current health score', () => {
+    expect(computeDeterioration(null, [snapshot('2026-08-01', 80)], NOW)).toBeNull();
+  });
+
+  it('returns null when there is no snapshot as of ~14 days ago', () => {
+    expect(computeDeterioration(42, [], NOW)).toBeNull();
+  });
+
+  it('returns null when the closest past snapshot has a null health score', () => {
+    const snapshots = [snapshot('2026-08-01', null)];
+    expect(computeDeterioration(42, snapshots, NOW)).toBeNull();
+  });
+
+  it('returns a negative delta when the project got worse (§18 example: 61 → 42)', () => {
+    const snapshots = [snapshot('2026-08-01', 61)];
+    expect(computeDeterioration(42, snapshots, NOW)).toBe(-19);
+  });
+
+  it('returns a positive delta when the project improved', () => {
+    const snapshots = [snapshot('2026-08-01', 61)];
+    expect(computeDeterioration(70, snapshots, NOW)).toBe(9);
+  });
+
+  it('returns 0 when the score is unchanged', () => {
+    const snapshots = [snapshot('2026-08-01', 61)];
+    expect(computeDeterioration(61, snapshots, NOW)).toBe(0);
+  });
+});
+
+describe('formatDeterioration (§18: "↓ -19 in 14 days")', () => {
+  it('returns null when there is no comparison point', () => {
+    expect(formatDeterioration(null)).toBeNull();
+  });
+
+  it('formats the §18 example', () => {
+    expect(formatDeterioration(-19)).toBe('↓ -19 in 14 days');
+  });
+
+  it('formats an improvement with a leading +', () => {
+    expect(formatDeterioration(9)).toBe('↑ +9 in 14 days');
+  });
+
+  it('formats no change with the flat arrow', () => {
+    expect(formatDeterioration(0)).toBe('→ 0 in 14 days');
   });
 });

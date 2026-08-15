@@ -15,6 +15,8 @@ const TREND_FLAT = '→';
 export const TREND_COMPARISON_WINDOW_DAYS = 7;
 /** How many of the most recent snapshots the Project Detail trend line shows (§16 mockup has 5). */
 export const TREND_LINE_POINTS = 5;
+/** How far back the Attention Queue's deterioration check looks (§18 mockup: "in 14 days"). */
+export const DETERIORATION_WINDOW_DAYS = 14;
 
 export interface TrendPoint {
   /** yyyy-mm-dd */
@@ -72,4 +74,38 @@ export function computeTrendDirection(
 export function formatTrendLine(points: TrendPoint[]): string {
   if (points.length === 0) return TREND_PLACEHOLDER;
   return points.map((point) => (point.healthScore === null ? 'N/A' : String(point.healthScore))).join(' → ');
+}
+
+/**
+ * Attention Queue deterioration (§18): current health score minus the score
+ * from ~`DETERIORATION_WINDOW_DAYS` days ago. Negative means the project got
+ * worse, positive means it improved. Null when either side of the comparison
+ * is unavailable — missing history must not be read as "no change" (§24
+ * Resilience), same reasoning as `computeTrendDirection` above.
+ */
+export function computeDeterioration(
+  currentHealthScore: number | null,
+  snapshots: StoredSnapshot[],
+  now: Date = new Date()
+): number | null {
+  if (currentHealthScore === null) return null;
+
+  const targetDate = isoDaysAgo(now, DETERIORATION_WINDOW_DAYS);
+  const past = findSnapshotAsOf(snapshots, targetDate);
+  if (!past || past.healthScore === null) return null;
+
+  return currentHealthScore - past.healthScore;
+}
+
+/**
+ * Formats the Attention Queue's deterioration line (§18: `↓ -19 in 14 days`).
+ * Null when there's no comparison point to report — the caller should omit
+ * the line rather than show a misleading "no change".
+ */
+export function formatDeterioration(deterioration: number | null): string | null {
+  if (deterioration === null) return null;
+
+  const arrow = deterioration < 0 ? TREND_DOWN : deterioration > 0 ? TREND_UP : TREND_FLAT;
+  const sign = deterioration > 0 ? '+' : '';
+  return `${arrow} ${sign}${deterioration} in ${DETERIORATION_WINDOW_DAYS} days`;
 }

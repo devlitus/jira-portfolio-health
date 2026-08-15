@@ -45,6 +45,8 @@ export interface DashboardEntry {
   trend?: string;
   /** Project Detail trend line (§16, Tarea 5.3), precomputed by the resolver from snapshot history. */
   trendLine?: string;
+  /** Health score change over the last 14 days (§18, Tarea 5.4), precomputed by the resolver from snapshot history. Null/undefined when there's no ~14-day-old snapshot to compare against. */
+  deterioration?: number | null;
 }
 
 function toRow({ project, outcome, trend }: DashboardEntry): DashboardProjectRow {

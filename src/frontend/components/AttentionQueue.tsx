@@ -26,6 +26,7 @@ const AttentionQueueCard: React.FC<{
       {STATUS_ICON[entry.status]} {entry.projectName}
     </p>
     <p>Health {entry.healthScore}</p>
+    {entry.deteriorationLabel && <p>{entry.deteriorationLabel}</p>}
     {entry.mainIssue && <p>Main issue: {entry.mainIssue}</p>}
     <button type="button" onClick={() => onSelectProject?.(entry.projectKey)}>
       View details

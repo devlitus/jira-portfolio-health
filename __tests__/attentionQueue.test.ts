@@ -101,11 +101,47 @@ describe('buildAttentionQueue (§18 Attention Queue)', () => {
     expect(queue[0].mainIssue).toBeNull();
   });
 
-  it('stubs deterioration at 0 until Fase 5 (Tarea 5.4)', () => {
+  it('defaults deterioration/deteriorationLabel to null when the entry carries no snapshot history', () => {
     const entries: DashboardEntry[] = [{ project: project('OK'), outcome: success('OK', 50, 'AT_RISK') }];
 
     const queue = buildAttentionQueue(entries);
 
-    expect(queue[0].deterioration).toBe(0);
+    expect(queue[0].deterioration).toBeNull();
+    expect(queue[0].deteriorationLabel).toBeNull();
+  });
+
+  it('carries through the resolver-precomputed deterioration and formats its label (§18)', () => {
+    const entries: DashboardEntry[] = [
+      { project: project('PAY'), outcome: success('PAY', 42, 'CRITICAL'), deterioration: -19 },
+    ];
+
+    const queue = buildAttentionQueue(entries);
+
+    expect(queue[0].deterioration).toBe(-19);
+    expect(queue[0].deteriorationLabel).toBe('↓ -19 in 14 days');
+  });
+
+  it('within the same severity and health score, orders by recent deterioration DESC (biggest drop first)', () => {
+    const entries: DashboardEntry[] = [
+      { project: project('SMALL_DROP'), outcome: success('SMALL_DROP', 50, 'AT_RISK'), deterioration: -3 },
+      { project: project('BIG_DROP'), outcome: success('BIG_DROP', 50, 'AT_RISK'), deterioration: -19 },
+      { project: project('IMPROVED'), outcome: success('IMPROVED', 50, 'AT_RISK'), deterioration: 5 },
+    ];
+
+    const queue = buildAttentionQueue(entries);
+
+    expect(queue.map((e) => e.projectKey)).toEqual(['BIG_DROP', 'SMALL_DROP', 'IMPROVED']);
+  });
+
+  it('treats unknown deterioration as unchanged for ordering purposes', () => {
+    const entries: DashboardEntry[] = [
+      { project: project('KNOWN_IMPROVED'), outcome: success('KNOWN_IMPROVED', 50, 'AT_RISK'), deterioration: 5 },
+      { project: project('UNKNOWN'), outcome: success('UNKNOWN', 50, 'AT_RISK') },
+      { project: project('KNOWN_DROP'), outcome: success('KNOWN_DROP', 50, 'AT_RISK'), deterioration: -5 },
+    ];
+
+    const queue = buildAttentionQueue(entries);
+
+    expect(queue.map((e) => e.projectKey)).toEqual(['KNOWN_DROP', 'UNKNOWN', 'KNOWN_IMPROVED']);
   });
 });

@@ -17,14 +17,21 @@ import { buildAttentionQueue } from './health/attentionQueue';
 import type { AttentionQueueEntry } from './health/attentionQueue';
 import { buildProjectDetail } from './health/projectDetail';
 import type { ProjectDetail } from './health/projectDetail';
-import { buildTrendSeries, computeTrendDirection, formatTrendLine, TREND_LINE_POINTS } from './health/trend';
+import {
+  buildTrendSeries,
+  computeDeterioration,
+  computeTrendDirection,
+  formatTrendLine,
+  TREND_LINE_POINTS,
+} from './health/trend';
 import type { TrendPoint } from './health/trend';
 import { getSnapshots } from './storage/snapshotStore';
 
 const resolver = new Resolver();
 
-/** Buffer window for `loadDashboardEntries`'s trend lookups (Tarea 5.3): long enough to both find a
- *  snapshot ~7 days back for the Trend column and supply the last `TREND_LINE_POINTS` for the detail line. */
+/** Buffer window for `loadDashboardEntries`'s snapshot lookups (Tarea 5.3/5.4): long enough to find a
+ *  snapshot ~7 days back for the Trend column, supply the last `TREND_LINE_POINTS` for the detail line,
+ *  and find the ~14-day-old snapshot the Attention Queue's deterioration check (Tarea 5.4) compares against. */
 const TREND_HISTORY_DAYS = 14;
 
 resolver.define('getProjects', async (): Promise<Project[]> => {
@@ -70,8 +77,9 @@ resolver.define('runAnalysis', async (): Promise<ProjectAnalysisOutcome[]> => {
  * no recomputation, so dashboard-derived views stay fast (§24 Performance).
  * Shared by `getDashboard` (Tarea 4.1), `getAttentionQueue` (Tarea 4.2) and
  * `getProjectDetail` (Tarea 4.3), which reduce this same data differently;
- * the trend column/line (Tarea 5.3) is precomputed here since it needs the
- * snapshot KVS reads that the pure `health/*` modules don't do themselves.
+ * the trend column/line (Tarea 5.3) and the deterioration check (Tarea 5.4)
+ * are precomputed here since they need the snapshot KVS reads that the pure
+ * `health/*` modules don't do themselves.
  */
 async function loadDashboardEntries(): Promise<DashboardEntry[]> {
   const config = await getConfig();
@@ -92,6 +100,7 @@ async function loadDashboardEntries(): Promise<DashboardEntry[]> {
         outcome: outcome ?? undefined,
         trend: computeTrendDirection(currentHealthScore, snapshots),
         trendLine: formatTrendLine(buildTrendSeries(snapshots.slice(-TREND_LINE_POINTS))),
+        deterioration: computeDeterioration(currentHealthScore, snapshots),
       };
     })
   );
