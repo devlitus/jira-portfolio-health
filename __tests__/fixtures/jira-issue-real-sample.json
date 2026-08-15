@@ -1,0 +1,35 @@
+{
+  "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+  "id": "10000",
+  "self": "https://developercarles.atlassian.net/rest/api/3/issue/10000",
+  "key": "KAN-1",
+  "changelog": {
+    "startAt": 0,
+    "maxResults": 0,
+    "total": 0,
+    "histories": []
+  },
+  "fields": {
+    "summary": "titlo",
+    "created": "2026-07-02T19:00:24.424+0200",
+    "resolutiondate": null,
+    "duedate": null,
+    "issuelinks": [],
+    "assignee": null,
+    "status": {
+      "self": "https://developercarles.atlassian.net/rest/api/3/status/10000",
+      "description": "",
+      "iconUrl": "https://developercarles.atlassian.net/",
+      "name": "To Do",
+      "id": "10000",
+      "statusCategory": {
+        "self": "https://developercarles.atlassian.net/rest/api/3/statuscategory/2",
+        "id": 2,
+        "key": "new",
+        "colorName": "blue-gray",
+        "name": "To Do"
+      }
+    },
+    "labels": []
+  }
+}

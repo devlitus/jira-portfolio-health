@@ -6,9 +6,11 @@
   "scripts": {
     "build": "esbuild src/frontend/index.tsx --bundle --minify --outfile=static/main/bundle.js",
     "watch": "esbuild src/frontend/index.tsx --bundle --outfile=static/main/bundle.js --watch",
-    "lint": "eslint src/**/*.{ts,tsx}"
+    "lint": "eslint src/**/*.{ts,tsx}",
+    "test": "jest"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/react": "^18.3.31",
     "@types/react-dom": "^18.3.7",
     "@typescript-eslint/eslint-plugin": "^8.67.0",
@@ -16,6 +18,8 @@
     "esbuild": "^0.28.2",
     "eslint": "^8.56.0",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "jest": "^30.4.2",
+    "ts-jest": "^29.4.12",
     "typescript": "^6.0.3"
   },
   "dependencies": {

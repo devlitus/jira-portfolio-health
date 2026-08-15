@@ -32,11 +32,11 @@ Objetivo: preparar el entorno y cerrar las decisiones de arquitectura antes de e
 
 ### Tarea 0.1 — Verificar entorno Forge
 
-- [ ] Ejecutar `pwd` y confirmar que estamos en la raíz de la app (`W:/addon/jira-portfolio-health`).
-- [ ] Verificar login: `forge whoami`.
-- [ ] Ejecutar `forge lint` sobre el template actual para confirmar que la base es válida.
-- [ ] Ejecutar `forge deploy --non-interactive -e development` del template y `forge install --non-interactive --site <site> --product jira --environment development` para validar el flujo completo de despliegue con el hello-world.
-- **DoD:** la app hello-world se ve en la global page de Jira del sitio de desarrollo.
+- [x] Ejecutar `pwd` y confirmar que estamos en la raíz de la app (`W:/addon/jira-portfolio-health`).
+- [x] Verificar login: `forge whoami`. → Carles Pedrero (developercarles@gmail.com).
+- [x] Ejecutar `forge lint` sobre el template actual para confirmar que la base es válida. → "No issues found."
+- [x] Ejecutar `forge deploy --non-interactive -e development` del template y `forge install --non-interactive --site <site> --product jira --environment development` para validar el flujo completo de despliegue con el hello-world. → Deploy OK (app v4.1.0); instalación ya existente (`0a6e1d8f-...`, site `developercarles.atlassian.net`, producto Jira) actualizada con `--upgrade` y confirmada "at the latest".
+- **DoD:** la app hello-world se ve en la global page de Jira del sitio de desarrollo. → Deploy/instalación verificados por CLI (site up-to-date); confirmación visual en el navegador pendiente de que el usuario la haga o la pida explícitamente.
 
 ### Tarea 0.2 — Decisiones de arquitectura (documentar en `docs/architecture-decisions.md`)
 

@@ -1,0 +1,75 @@
+{
+  "id": "10042",
+  "key": "KAN-42",
+  "fields": {
+    "summary": "Implement payment retry logic",
+    "created": "2026-06-01T09:00:00.000+0200",
+    "resolutiondate": "2026-06-20T17:30:00.000+0200",
+    "duedate": "2026-06-15",
+    "labels": ["backend", "payments"],
+    "assignee": {
+      "accountId": "557058:fc212809-c608-44e1-86f3-5416a3d46db5"
+    },
+    "status": {
+      "name": "Done",
+      "statusCategory": { "key": "done", "name": "Done" }
+    },
+    "issuelinks": [
+      {
+        "type": { "name": "Blocks", "inward": "is blocked by", "outward": "blocks" },
+        "inwardIssue": {
+          "key": "KAN-40",
+          "fields": {
+            "status": { "statusCategory": { "key": "indeterminate" } }
+          }
+        }
+      },
+      {
+        "type": { "name": "Blocks", "inward": "is blocked by", "outward": "blocks" },
+        "outwardIssue": {
+          "key": "OPS-7",
+          "fields": {
+            "status": { "statusCategory": { "key": "done" } }
+          }
+        }
+      },
+      {
+        "type": { "name": "Relates", "inward": "relates to", "outward": "relates to" },
+        "outwardIssue": {
+          "key": "KAN-41",
+          "fields": {
+            "status": { "statusCategory": { "key": "new" } }
+          }
+        }
+      }
+    ]
+  },
+  "changelog": {
+    "histories": [
+      {
+        "created": "2026-06-02T10:00:00.000+0200",
+        "items": [
+          { "field": "status", "fromString": "To Do", "toString": "In Progress" }
+        ]
+      },
+      {
+        "created": "2026-06-10T11:00:00.000+0200",
+        "items": [
+          { "field": "status", "fromString": "In Progress", "toString": "Done" }
+        ]
+      },
+      {
+        "created": "2026-06-12T08:00:00.000+0200",
+        "items": [
+          { "field": "status", "fromString": "Done", "toString": "In Progress" }
+        ]
+      },
+      {
+        "created": "2026-06-20T17:30:00.000+0200",
+        "items": [
+          { "field": "status", "fromString": "In Progress", "toString": "Done" }
+        ]
+      }
+    ]
+  }
+}

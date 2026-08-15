@@ -3,6 +3,13 @@ modules:
     - key: jira-portfolio-health-global-page-hello-world
       resource: main
       title: jira-portfolio-health
+  scheduledTrigger:
+    - key: jira-portfolio-health-daily-snapshot
+      function: daily-snapshot
+      interval: day
+  function:
+    - key: daily-snapshot
+      handler: triggers/dailySnapshot.run
 app:
   runtime:
     name: nodejs24.x
@@ -13,4 +20,6 @@ resources:
   - key: main
     path: static/main
 permissions:
-  scopes: []
+  scopes:
+    - read:jira-work
+    - read:jira-user
