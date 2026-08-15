@@ -115,7 +115,7 @@ Sin referencia visual directa del mockup (`code.html` solo cubre Dashboard) — 
 
 ### Tarea F.1 — `ProjectSelector.tsx` (setup screen)
 
-- [ ] Re-estilizar el checklist de proyectos y el estado "No projects found" con los tokens (card, checkboxes, botón primario Atlassian-blue).
+- [x] Re-estilizar el checklist de proyectos y el estado "No projects found" con los tokens (card, checkboxes, botón primario Atlassian-blue).
 - **DoD:** `selectedKeys.size === 0` sigue deshabilitando "Start analysis".
 
 ### Tarea F.2 — Estados vacíos/error inline en `index.tsx`
