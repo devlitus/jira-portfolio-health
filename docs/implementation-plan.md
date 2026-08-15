@@ -310,11 +310,11 @@ Archivo: `src/storage/snapshotStore.js`
 
 Tarea grande — subtareas:
 
-- [ ] **5.1.a — `saveSnapshot(projectKey, snapshot)`:** KVS clave `snapshot:<projectKey>:<yyyy-mm-dd>` con el formato `ProjectSnapshot` de §22.
-- [ ] **5.1.b — `getSnapshots(projectKey, days)`:** lectura de los últimos N días (consultar capacidad de query por prefijo de KVS; si no basta, mantener un índice por proyecto `snapshots-index:<projectKey>` con las fechas).
-- [ ] **5.1.c — `getBaseline(projectKey)`:** primer snapshot del proyecto (cierra la Tarea 2.3).
-- [ ] **5.1.d — Retención:** borrar snapshots > 90 días (MVP; documentar decisión).
-- **DoD:** tests con mock de KVS: guardar, leer rango, baseline, retención.
+- [x] **5.1.a — `saveSnapshot(projectKey, snapshot)`:** KVS clave `snapshot:<projectKey>:<yyyy-mm-dd>` con el formato `ProjectSnapshot` de §22. → `src/storage/snapshotStore.ts` (convención `.ts` del repo); tipo `StoredSnapshot = ProjectSnapshot & { totalIssues: number }` — extiende el `ProjectSnapshot` de `src/metrics/model.ts` con el issue count que necesita `getBaseline` (5.1.c), sin tocar el tipo del health engine ni los resolvers de Fase 3/4.
+- [x] **5.1.b — `getSnapshots(projectKey, days)`:** lectura de los últimos N días. → `@forge/kvs` sí soporta query por prefijo de `key` (`kvs.query().where('key', WhereConditions.beginsWith(...))`), así que no hace falta el índice alternativo `snapshots-index:<projectKey>`; los resultados se ordenan explícitamente por `date` (el orden de la query no está garantizado) y `getSnapshots` devuelve los últimos N, más antiguo primero.
+- [x] **5.1.c — `getBaseline(projectKey)`:** primer snapshot del proyecto (cierra la Tarea 2.3). → Reemplaza el stub de la Tarea 2.3; devuelve `totalIssues` del snapshot más antiguo almacenado, o `null` si el proyecto aún no tiene snapshots.
+- [x] **5.1.d — Retención:** borrar snapshots > 90 días (MVP; documentar decisión). → `pruneExpiredSnapshots(projectKey, now?)`, constante `RETENTION_DAYS = 90` (sin pantalla de configuración todavía, documentado en el código); `saveSnapshot` la invoca tras cada escritura para que el storage se autolimite sin depender de que el trigger diario (Tarea 5.2) se acuerde de llamarla.
+- **DoD:** tests con mock de KVS: guardar, leer rango, baseline, retención. → `__tests__/snapshotStore.test.ts` (10 tests: persistencia por clave, rango de N días más antiguo→más reciente, aislamiento por proyecto, baseline con/sin snapshots y con inserción desordenada, retención de 90 días y no-retención dentro de ventana, poda automática desde `saveSnapshot`); mock de `@forge/kvs` con `query()` en memoria (extiende el patrón `useInMemoryKvs` de `configStore.test.ts`). `npm test` (130/130), `npm run lint`, `tsc --noEmit` y `forge lint` en verde.
 
 ### Tarea 5.2 — Scheduled trigger diario (§19)
 
