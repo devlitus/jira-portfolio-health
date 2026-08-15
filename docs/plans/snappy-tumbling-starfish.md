@@ -80,7 +80,7 @@ Objetivo: envolver la app en el sidebar/topbar del sistema de diseño, mapeado a
 
 ### Tarea C.3 — Sección "Recent Alerts" (nueva, Adaptación 7)
 
-- [ ] Card `lg:col-span-12` debajo de la tabla, listando `summary.alerts` en formato compacto (proyecto, mensaje, fecha), mismo lenguaje visual que Attention Queue.
+- [x] Card `lg:col-span-12` debajo de la tabla, listando `summary.alerts` en formato compacto (proyecto, mensaje, fecha), mismo lenguaje visual que Attention Queue.
 - **DoD:** con `alerts.length === 0` se muestra un estado vacío consistente con el resto (no una sección vacía silenciosa).
 
 ---

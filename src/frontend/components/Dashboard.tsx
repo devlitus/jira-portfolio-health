@@ -4,10 +4,11 @@
 // already-reduced summary (src/health/dashboard.ts) — no computation here,
 // just rendering.
 import React from 'react';
-import type { DashboardProjectRow, DashboardStatusCounts, DashboardSummary } from '../../health/dashboard';
+import type { DashboardProjectRow, DashboardStatusCounts, DashboardSummary, PortfolioAlert } from '../../health/dashboard';
 import type { HealthStatus } from '../../metrics/model';
 import { StatusBadge } from './ui/StatusBadge';
 import { TrendBadge } from './ui/TrendBadge';
+import { NotificationsIcon, WarningIcon } from './ui/icons';
 
 // Bento hero card (Tarea C.1, DESIGN.md § Components "Health Progress Bars"):
 // one row per status with a dot, count and a proportional bar. `total` is the
@@ -82,6 +83,21 @@ interface DashboardProps {
   onRerunAnalysis?: () => void;
   isRerunning?: boolean;
 }
+
+// Recent Alerts row (Tarea C.3, Adaptación 7): mismo lenguaje visual que las
+// "Actionable Cards" de DESIGN.md (borde-acento izquierdo de 4px por
+// severidad) — todas las alertas del §20 son eventos negativos, así que usan
+// el color crítico en vez de variar por status.
+const AlertRow: React.FC<{ alert: PortfolioAlert }> = ({ alert }) => (
+  <li className="flex items-start gap-3 border-l-4 border-status-critical bg-surface p-4">
+    <WarningIcon size={16} className="mt-0.5 shrink-0 text-status-critical" />
+    <div className="min-w-0 flex-1">
+      <span className="font-label-bold text-label-bold text-text-heading">{alert.projectName}</span>{' '}
+      <span className="font-body-sm text-body-sm text-on-surface-variant">{alert.message}</span>
+    </div>
+    <span className="shrink-0 font-data-mono text-data-mono text-on-surface-variant">{alert.date}</span>
+  </li>
+);
 
 const TopAttentionItem: React.FC<{ project: DashboardProjectRow }> = ({ project }) => (
   <li>
@@ -229,21 +245,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
       </div>
 
       <section>
-        <h2>Alerts</h2>
-        {alerts.length === 0 ? (
-          <p>No alerts.</p>
-        ) : (
-          <ul>
-            {alerts.map((alert, index) => (
-              <li key={`${alert.projectKey}-${alert.code}-${alert.date}-${index}`}>
-                <strong>{alert.projectName}</strong>: {alert.message} ({alert.date})
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      <section>
         <h2>Top Attention</h2>
         {topAttention.length === 0 ? (
           <p>No projects with a calculated health score yet.</p>
@@ -286,6 +287,24 @@ export const Dashboard: React.FC<DashboardProps> = ({
             </tbody>
           </table>
         </div>
+      </section>
+
+      <section className="overflow-hidden rounded-xl border border-outline-variant bg-surface shadow-sm lg:col-span-12">
+        <div className="flex items-center gap-2 border-b border-outline-variant bg-surface-slate p-4">
+          <NotificationsIcon size={18} className="text-on-surface-variant" />
+          <h2 className="font-headline-sm text-headline-sm uppercase text-text-heading">Recent Alerts</h2>
+        </div>
+        {alerts.length === 0 ? (
+          <p className="p-6 text-center font-body-sm text-body-sm text-on-surface-variant">
+            No recent alerts.
+          </p>
+        ) : (
+          <ul className="divide-y divide-outline-variant/50">
+            {alerts.map((alert, index) => (
+              <AlertRow key={`${alert.projectKey}-${alert.code}-${alert.date}-${index}`} alert={alert} />
+            ))}
+          </ul>
+        )}
       </section>
     </section>
   );
