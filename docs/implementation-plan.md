@@ -231,13 +231,13 @@ Tarea grande — una subtarea por dimensión; cada una devuelve `{ score, factor
 
 Archivo: `src/health/recommendations.js`
 
-- [ ] Tabla de reglas simples (data-driven, array de reglas `{ when, recommendation }`), NO IA:
+- [x] Tabla de reglas simples (data-driven, array de reglas `{ when, recommendation }`), NO IA:
   - `scope_growth > 20%` → "Review or remove low-priority scope."
   - `blocked_issues >= 3` → "Review the top blockers and assign owners."
   - `overdue_ratio > 0.20` → "Review project schedule and overdue work."
-  - `workload_signal == HIGH` → "Review WIP and team allocation."
-- [ ] Ordenar recomendaciones por impacto del factor que las origina; limitar a top 3 por proyecto.
-- **DoD:** tests por cada regla + caso sin recomendaciones (proyecto sano).
+  - `workload_signal == HIGH` → "Review WIP and team allocation." → `src/health/recommendations.ts` (convención `.ts` del repo), constante `RULES` (`{ code, when, message }`, `code` = `HealthFactor.code` de la Tarea 3.2 correspondiente).
+- [x] Ordenar recomendaciones por impacto del factor que las origina; limitar a top 3 por proyecto. → `generateRecommendations(metrics, dimensions)` busca el `impact` del factor con el mismo `code` entre los factores de las 5 dimensiones y ordena ascendente (más negativo primero); `MAX_RECOMMENDATIONS = 3`.
+- **DoD:** tests por cada regla + caso sin recomendaciones (proyecto sano). → `__tests__/recommendations.test.ts` (7 tests: una por regla, proyecto sano sin recomendaciones, orden por impacto + tope de 3); `npm test` (99/99), `npm run lint`, `tsc --noEmit` y `forge lint` en verde.
 
 ### Tarea 3.5 — Orquestador del análisis
 
