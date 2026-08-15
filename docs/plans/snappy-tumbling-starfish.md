@@ -129,8 +129,8 @@ Sin referencia visual directa del mockup (`code.html` solo cubre Dashboard) — 
 
 ### Tarea G.1 — Build y checks estáticos
 
-- [ ] `npm run build` (Tailwind + esbuild) sin errores.
-- [ ] `npm run lint` y `npm test` sin romper nada (no tocan `src/health`/`src/metrics`, y no hay tests de componentes que migrar).
+- [x] `npm run build` (Tailwind + esbuild) sin errores.
+- [x] `npm run lint` y `npm test` sin romper nada (no tocan `src/health`/`src/metrics`, y no hay tests de componentes que migrar).
 - **DoD:** los 3 comandos pasan en verde.
 
 ### Tarea G.2 — Chequeo visual
