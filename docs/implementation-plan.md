@@ -172,10 +172,10 @@ Tarea grande — subtareas:
 
 ### Tarea 2.4 — Métricas de Capacity (§12)
 
-- [ ] WIP por usuario: issues In Progress agrupados por assignee (ignorar unassigned).
-- [ ] `averageWipPerUser`, `maxWipPerUser`, señal `workloadSignal: LOW | NORMAL | HIGH` comparando WIP actual vs. media histórica del propio proyecto (en MVP: umbrales fijos documentados, p. ej. HIGH si WIP/usuario > 1.5× media de usuarios activos).
-- [ ] Si hay menos de N usuarios con WIP (datos insuficientes) → `capacity: null` con reason "Insufficient workload/capacity data" (§12 — no inventar datos).
-- **DoD:** tests: proyecto sano, sobrecargado, sin assignees (→ `null`).
+- [x] WIP por usuario: issues In Progress agrupados por assignee (ignorar unassigned). → `src/metrics/capacity.ts`, `computeCapacityMetrics()`.
+- [x] `averageWipPerUser`, `maxWipPerUser`, señal `workloadSignal: LOW | NORMAL | HIGH` comparando WIP actual vs. media histórica del propio proyecto (en MVP: umbrales fijos documentados, p. ej. HIGH si WIP/usuario > 1.5× media de usuarios activos). → Sin datos históricos disponibles en Fase 2 (funciones puras, §23), se compara cada usuario contra la media *actual* del equipo: HIGH si `maxWipPerUser > 1.5×` la media; LOW si la media < 1.5 (mayoría de usuarios con un único issue en WIP); umbrales documentados en el código.
+- [x] Si hay menos de N usuarios con WIP (datos insuficientes) → `capacity: null` con reason "Insufficient workload/capacity data" (§12 — no inventar datos). → `N = 2` (`MIN_ACTIVE_USERS`); función devuelve `{ ok: false, reason: "Insufficient workload/capacity data" }` (mismo patrón `ok/reason` que `src/jira/client.ts`).
+- **DoD:** tests: proyecto sano, sobrecargado, sin assignees (→ `null`). → `__tests__/capacityMetrics.test.ts` (5 tests: NORMAL, HIGH, LOW, sin assignees, <2 usuarios con WIP); `npm test` (46/46), `npm run lint`, `tsc --noEmit` y `forge lint` en verde.
 
 ### Tarea 2.5 — Métricas de Dependencies (§13)
 
