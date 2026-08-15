@@ -320,10 +320,10 @@ Tarea grande — subtareas:
 
 Archivo: `src/triggers/dailySnapshot.js`
 
-- [ ] Completar el handler del `scheduledTrigger` (registrado en Fase 1): para cada proyecto seleccionado → `analyzeProject` → `saveSnapshot`.
-- [ ] Idempotencia: si ya existe snapshot de hoy, sobrescribir (misma clave) — seguro ante re-ejecuciones.
-- [ ] Logs sin contenido sensible (§25): solo project key y timings, nunca summaries de issues.
-- **DoD:** verificado con `forge logs --since 15m -e development` tras forzar una ejecución.
+- [x] Completar el handler del `scheduledTrigger` (registrado en Fase 1): para cada proyecto seleccionado → `analyzeProject` → `saveSnapshot`. → `src/triggers/dailySnapshot.ts`, función `run()`: lee `getConfig()`, se autentica con `asApp()` (no `asUser()` — un scheduled trigger no tiene usuario interactivo asociado, excepción documentada en el código respecto a `docs/architecture-decisions.md #3`, que solo cubre resolvers interactivos) y ejecuta `analyzeProject` en paralelo (`Promise.all`) para cada `selectedProjectKeys`; `analyzeProject` se extendió (Tarea 3.5) para devolver también `totalIssues`, que `StoredSnapshot` (Tarea 5.1.a) necesita para el baseline de scope.
+- [x] Idempotencia: si ya existe snapshot de hoy, sobrescribir (misma clave) — seguro ante re-ejecuciones. → Ya garantizado por `saveSnapshot` (Tarea 5.1.a), que escribe siempre en la clave fija `snapshot:<projectKey>:<yyyy-mm-dd>`; el trigger no necesita lógica adicional de idempotencia.
+- [x] Logs sin contenido sensible (§25): solo project key y timings, nunca summaries de issues. → `console.log` solo con `projectKey` + duración en ms por proyecto (éxito/fallo) y un resumen final con el conteo de proyectos procesados; nunca título/descripción/summary de issues.
+- **DoD:** verificado con `forge logs --since 15m -e development` tras forzar una ejecución. → `npm test` (134/134, incl. `__tests__/dailySnapshot.test.ts` con 4 tests: análisis+guardado por proyecto seleccionado, fallo de un proyecto no aborta el resto, sin proyectos seleccionados no hace nada, logs sin contenido de issues), `npm run lint`, `tsc --noEmit` y `forge lint` en verde; `npm run build` genera `static/main/bundle.js`; `forge deploy --non-interactive -e development` OK (v5.6.0, sin cambios de scopes → no requiere reinstalar). Forge CLI no ofrece un comando para forzar la ejecución de un `scheduledTrigger` (a diferencia de un `webtrigger` invocable por HTTP) — solo dispara según su `interval: day` — así que la verificación con `forge logs --since 15m -e development` sobre una ejecución real en el sitio de desarrollo queda pendiente de que el usuario la haga o la pida explícitamente (igual que en las Tareas 0.1/1.5.d/3.5/4.1/4.3/4.4), esperando a la próxima ejecución programada del cron.
 
 ### Tarea 5.3 — Trends en UI
 

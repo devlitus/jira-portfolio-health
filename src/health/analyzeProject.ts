@@ -27,6 +27,9 @@ import { getBaseline } from '../storage/snapshotStore';
 import { DEFAULT_THRESHOLDS, StatusThresholds } from '../storage/configStore';
 
 export interface ProjectAnalysisResult extends ProjectSnapshot {
+  /** Issue count at analysis time — the scope-growth baseline unit (§11),
+   * needed by saveSnapshot()'s StoredSnapshot shape (Tarea 5.1/5.2). */
+  totalIssues: number;
   recommendations: Recommendation[];
 }
 
@@ -95,6 +98,7 @@ export async function analyzeProject(
     healthScore,
     status,
     dimensions,
+    totalIssues: issues.length,
     recommendations,
   };
 }

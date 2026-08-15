@@ -32,6 +32,7 @@ function success(
       capacity: EMPTY_DIMENSION,
       dependencies: EMPTY_DIMENSION,
     },
+    totalIssues: 0,
     recommendations: [],
   };
 }

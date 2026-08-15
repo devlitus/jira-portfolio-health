@@ -68,6 +68,7 @@ describe('analyzeProject', () => {
     expect(result.status).toBe('HEALTHY');
     expect(result.dimensions.schedule.score).toBe(100);
     expect(result.dimensions.dependencies.score).toBe(100);
+    expect(result.totalIssues).toBe(2);
     expect(Array.isArray(result.recommendations)).toBe(true);
     expect(mockedGetProjectIssues).toHaveBeenCalledWith(fakeApi, 'KAN', { storyPointsFieldId: undefined });
     expect(mockedGetBaseline).toHaveBeenCalledWith('KAN');
