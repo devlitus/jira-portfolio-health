@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { invoke } from '@forge/bridge';
 import { ProjectSelector } from './components/ProjectSelector';
+import { Dashboard } from './components/Dashboard';
 import type { Project } from '../metrics/model';
-import type { ProjectAnalysisOutcome } from '../health/analyzeProject';
+import type { DashboardSummary } from '../health/dashboard';
 
 // Custom UI app (see AGENTS.md's "UI approach: Custom UI" override): a plain
 // React tree bundled to static files and served by Forge, talking to the
@@ -31,7 +32,7 @@ const App: React.FC = () => {
   const [status, setStatus] = useState<Status>('loading');
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
-  const [analysisResults, setAnalysisResults] = useState<ProjectAnalysisOutcome[]>([]);
+  const [dashboard, setDashboard] = useState<DashboardSummary | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -47,7 +48,15 @@ const App: React.FC = () => {
 
         setProjects(fetchedProjects);
         setSelectedKeys(new Set(config.selectedProjectKeys));
-        setStatus(config.selectedProjectKeys.length > 0 ? 'ready' : 'setup');
+
+        if (config.selectedProjectKeys.length > 0) {
+          const summary = (await invoke('getDashboard')) as DashboardSummary;
+          if (cancelled) return;
+          setDashboard(summary);
+          setStatus('ready');
+        } else {
+          setStatus('setup');
+        }
       } catch (err) {
         if (cancelled) return;
         setError(err instanceof Error ? err.message : 'Failed to load portfolio setup.');
@@ -80,8 +89,9 @@ const App: React.FC = () => {
         selectedProjectKeys: Array.from(selectedKeys),
       })) as PortfolioConfig;
       setSelectedKeys(new Set(config.selectedProjectKeys));
-      const results = (await invoke('runAnalysis')) as ProjectAnalysisOutcome[];
-      setAnalysisResults(results);
+      await invoke('runAnalysis');
+      const summary = (await invoke('getDashboard')) as DashboardSummary;
+      setDashboard(summary);
       setStatus('ready');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to analyze the portfolio.');
@@ -110,27 +120,14 @@ const App: React.FC = () => {
     );
   }
 
-  if (status === 'ready') {
-    const monitoredProjects = projects.filter((project) => selectedKeys.has(project.key));
+  if (status === 'ready' && dashboard) {
     return (
-      <section>
-        <h1>Portfolio ready</h1>
-        <ul>
-          {monitoredProjects.map((project) => {
-            const result = analysisResults.find((r) => r.projectKey === project.key);
-            return (
-              <li key={project.key}>
-                {project.name}
-                {result?.ok && ` — Health ${result.healthScore ?? 'N/A'} (${result.status ?? 'N/A'})`}
-                {result && !result.ok && ` — Analysis unavailable: ${result.reason}`}
-              </li>
-            );
-          })}
-        </ul>
+      <>
+        <Dashboard summary={dashboard} />
         <button type="button" onClick={() => setStatus('setup')}>
           Edit selection
         </button>
-      </section>
+      </>
     );
   }
 

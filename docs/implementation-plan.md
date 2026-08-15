@@ -264,11 +264,11 @@ Archivos: `src/frontend/index.jsx`, `src/frontend/components/*.jsx`
 
 Tarea grande — subtareas:
 
-- [ ] **4.1.a — Resolver `getDashboard`:** devuelve overall health (media de health scores de proyectos), conteos por status y la lista de proyectos con health/trend/status desde KVS `latest:*`.
-- [ ] **4.1.b — Cabecera ejecutiva:** "Overall Health 74/100" + conteos Critical/At Risk/On Track (`Heading`, `Lozenge`, `Inline`).
-- [ ] **4.1.c — Top Attention:** los 3 proyectos con peor health (`SectionMessage` o lista con `Lozenge` de color por status).
-- [ ] **4.1.d — Tabla Health by Project:** `DynamicTable` (NUNCA `Table`) con columnas Project / Health / Trend / Status; trend de momento placeholder "—" (se rellena en Fase 5).
-- **DoD:** dashboard carga en < 10 s con datos reales del sitio de desarrollo.
+- [x] **4.1.a — Resolver `getDashboard`:** devuelve overall health (media de health scores de proyectos), conteos por status y la lista de proyectos con health/trend/status desde KVS `latest:*`. → `src/index.ts`, resolver `getDashboard`; lee `getConfig()` + `listProjects(asUser())` (para nombres actuales) + `kvs.get('latest:<projectKey>')` por proyecto seleccionado y reduce con la función pura `buildDashboardSummary` (`src/health/dashboard.ts`) — sin recomputar el análisis (§24 Performance).
+- [x] **4.1.b — Cabecera ejecutiva:** "Overall Health 74/100" + conteos Critical/At Risk/On Track (`Heading`, `Lozenge`, `Inline`). → `src/frontend/components/Dashboard.tsx`; este repo usa Custom UI (no UI Kit, ver Tarea 1.5.c/`CLAUDE.md`), así que la cabecera usa `<h1>/<h2>/<p>` en vez de `Heading`/`Inline`.
+- [x] **4.1.c — Top Attention:** los 3 proyectos con peor health (`SectionMessage` o lista con `Lozenge` de color por status). → `Dashboard.tsx`, sección "Top Attention": lista ordenada (`topAttention` de `buildDashboardSummary`, ascendente por health) con badge de status coloreado; Custom UI en vez de `SectionMessage`/`Lozenge`.
+- [x] **4.1.d — Tabla Health by Project:** `DynamicTable` (NUNCA `Table`) con columnas Project / Health / Trend / Status; trend de momento placeholder "—" (se rellena en Fase 5). → `Dashboard.tsx`, tabla HTML nativa (`<table>`) — Custom UI, no `DynamicTable`/UI Kit `Table`; columna Trend fija en `'—'` (`TREND_PLACEHOLDER` en `src/health/dashboard.ts`) hasta la Tarea 5.3.
+- **DoD:** dashboard carga en < 10 s con datos reales del sitio de desarrollo. → `npm test` (109/109, incl. `__tests__/dashboard.test.ts` con 6 tests de `buildDashboardSummary`), `npm run lint`, `tsc --noEmit` y `forge lint` en verde; `npm run build` genera `static/main/bundle.js`; `forge deploy --non-interactive -e development` OK (v5.2.0, sin cambios de scopes → no requiere reinstalar). Confirmación visual del tiempo de carga en el sitio de desarrollo queda pendiente de que el usuario la haga o la pida explícitamente (igual que en las Tareas 0.1/1.5.d/3.5).
 
 ### Tarea 4.2 — Attention Queue (§18)
 

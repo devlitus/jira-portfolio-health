@@ -11,6 +11,8 @@ import type { PortfolioConfig, PortfolioConfigInput } from './storage/configStor
 import type { Project } from './metrics/model';
 import { analyzeProject } from './health/analyzeProject';
 import type { ProjectAnalysisOutcome } from './health/analyzeProject';
+import { buildDashboardSummary } from './health/dashboard';
+import type { DashboardSummary } from './health/dashboard';
 
 const resolver = new Resolver();
 
@@ -48,6 +50,29 @@ resolver.define('runAnalysis', async (): Promise<ProjectAnalysisOutcome[]> => {
       return result;
     })
   );
+});
+
+/**
+ * Portfolio overview (Tarea 4.1): reads the selected projects' names (Jira,
+ * so the dashboard reflects current project names) and their latest cached
+ * analysis (KVS `latest:<projectKey>`, written by `runAnalysis`), and
+ * reduces them to the dashboard's executive summary — no recomputation, so
+ * the dashboard stays fast (§24 Performance).
+ */
+resolver.define('getDashboard', async (): Promise<DashboardSummary> => {
+  const config = await getConfig();
+  const allProjects = await listProjects(asUser());
+  const projectsByKey = new Map(allProjects.map((project) => [project.key, project]));
+
+  const entries = await Promise.all(
+    config.selectedProjectKeys.map(async (projectKey) => {
+      const project = projectsByKey.get(projectKey) ?? { id: projectKey, key: projectKey, name: projectKey };
+      const outcome = await kvs.get<ProjectAnalysisOutcome>(`latest:${projectKey}`);
+      return { project, outcome: outcome ?? undefined };
+    })
+  );
+
+  return buildDashboardSummary(entries);
 });
 
 export const handler = resolver.getDefinitions();
