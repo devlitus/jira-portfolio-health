@@ -7,10 +7,18 @@
 // Dashboard.tsx y AttentionQueue.tsx (cards `rounded-xl border
 // border-outline-variant bg-surface shadow-sm`, cabeceras `bg-surface-slate`,
 // divisores suaves `divide-outline-variant/50`). "Why?"/"Recommended
-// actions" quedan con su maquetación original — Tarea E.2 les añade
-// Explainer Tooltips.
+// actions" (Tarea E.2, DESIGN.md § Components "Explainer Tooltips"): cada
+// fila lleva un icono `info` enfocable/hoverable que revela un tooltip
+// slate-oscuro con el detalle del `HealthFactor` (mensaje + impacto en
+// puntos). Las recomendaciones no traen `impact` propio (Recommendation solo
+// expone `code`/`message`, Tarea 3.4) pero su `code` coincide con el
+// `HealthFactor.code` que las disparó (recommendations.ts § RULES), así que
+// el tooltip de cada recomendación busca ese factor en la lista ya calculada
+// por el backend en vez de inventar datos.
 import React from 'react';
 import type { DimensionDetail, DimensionName, ProjectDetail as ProjectDetailData } from '../../health/projectDetail';
+import type { HealthFactor } from '../../metrics/model';
+import type { Recommendation } from '../../health/recommendations';
 import { StatusBadge } from './ui/StatusBadge';
 import { InfoIcon, WarningIcon } from './ui/icons';
 
@@ -25,6 +33,56 @@ const DIMENSION_LABELS: Record<DimensionName, string> = {
   scope: 'Scope',
   capacity: 'Capacity',
   dependencies: 'Dependencies',
+};
+
+function formatImpact(impact: number): string {
+  const points = Math.abs(impact);
+  return `${impact > 0 ? '+' : '-'}${points} pt${points === 1 ? '' : 's'}`;
+}
+
+// Grupo `relative` + `group`/`group-focus-within` (mismo patrón que la
+// tooltip de la barra Critical/At Risk/Healthy en Dashboard.tsx) para que el
+// tooltip funcione tanto con hover como con foco de teclado.
+const ExplainerTooltip: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div className="pointer-events-none absolute left-6 top-full z-20 mt-1 w-56 rounded bg-inverse-surface px-3 py-2 font-body-sm text-body-sm text-inverse-on-surface opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+    {children}
+  </div>
+);
+
+const ExplainerIcon: React.FC<{ label: string }> = ({ label }) => (
+  <span tabIndex={0} aria-label={label} className="mt-0.5 shrink-0 cursor-help text-on-surface-variant focus:outline-none">
+    <InfoIcon size={16} />
+  </span>
+);
+
+const FactorRow: React.FC<{ factor: HealthFactor }> = ({ factor }) => (
+  <li className="group relative flex items-start gap-2 p-4">
+    <ExplainerIcon label={`Why: ${formatImpact(factor.impact)} on the health score`} />
+    <span className="font-body-md text-body-md text-on-surface-variant">{factor.message}</span>
+    <ExplainerTooltip>{formatImpact(factor.impact)} on the health score.</ExplainerTooltip>
+  </li>
+);
+
+const RecommendationRow: React.FC<{ recommendation: Recommendation; factors: HealthFactor[] }> = ({
+  recommendation,
+  factors,
+}) => {
+  const relatedFactor = factors.find((factor) => factor.code === recommendation.code);
+  return (
+    <li className="group relative flex items-start gap-2 p-4">
+      {relatedFactor ? (
+        <>
+          <ExplainerIcon label={`Why: ${relatedFactor.message}`} />
+          <ExplainerTooltip>
+            {relatedFactor.message} ({formatImpact(relatedFactor.impact)})
+          </ExplainerTooltip>
+        </>
+      ) : (
+        <InfoIcon size={16} className="mt-0.5 shrink-0 text-on-surface-variant" />
+      )}
+      <span className="font-body-md text-body-md text-on-surface-variant">{recommendation.message}</span>
+    </li>
+  );
 };
 
 const DimensionRow: React.FC<{ dimension: DimensionDetail }> = ({ dimension }) => (
@@ -97,31 +155,38 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ detail, onBack }) 
             </ul>
           </section>
 
-          <section>
-            <h2>Why?</h2>
+          <section className="overflow-hidden rounded-xl border border-outline-variant bg-surface shadow-sm">
+            <div className="border-b border-outline-variant bg-surface-slate p-4">
+              <h2 className="font-headline-sm text-headline-sm uppercase text-text-heading">Why?</h2>
+            </div>
             {factors.length === 0 ? (
-              <p>
+              <p className="p-6 text-center font-body-sm text-body-sm text-on-surface-variant">
                 {healthScore === null
                   ? 'N/A — Insufficient data to explain this yet.'
                   : 'No issues found — this project looks healthy.'}
               </p>
             ) : (
-              <ol>
+              // Ya vienen ordenados por impacto desde buildProjectDetail (§16) — no se reordenan aquí.
+              <ol className="divide-y divide-outline-variant/50">
                 {factors.map((factor) => (
-                  <li key={factor.code}>{factor.message}</li>
+                  <FactorRow key={factor.code} factor={factor} />
                 ))}
               </ol>
             )}
           </section>
 
-          <section>
-            <h2>Recommended actions</h2>
+          <section className="overflow-hidden rounded-xl border border-outline-variant bg-surface shadow-sm">
+            <div className="border-b border-outline-variant bg-surface-slate p-4">
+              <h2 className="font-headline-sm text-headline-sm uppercase text-text-heading">Recommended actions</h2>
+            </div>
             {recommendations.length === 0 ? (
-              <p>No actions needed right now.</p>
+              <p className="p-6 text-center font-body-sm text-body-sm text-on-surface-variant">
+                No actions needed right now.
+              </p>
             ) : (
-              <ol>
+              <ol className="divide-y divide-outline-variant/50">
                 {recommendations.map((recommendation) => (
-                  <li key={recommendation.code}>{recommendation.message}</li>
+                  <RecommendationRow key={recommendation.code} recommendation={recommendation} factors={factors} />
                 ))}
               </ol>
             )}

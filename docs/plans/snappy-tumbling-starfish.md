@@ -106,7 +106,7 @@ Sin referencia visual directa del mockup (`code.html` solo cubre Dashboard) — 
 
 ### Tarea E.2 — "Why?" y "Recommended actions"
 
-- [ ] Listas de `factors`/`recommendations` con tooltips explicativos (fondo slate oscuro, texto `body-sm` blanco) por factor, siguiendo "Explainer Tooltips" de `DESIGN.md`.
+- [x] Listas de `factors`/`recommendations` con tooltips explicativos (fondo slate oscuro, texto `body-sm` blanco) por factor, siguiendo "Explainer Tooltips" de `DESIGN.md`.
 - **DoD:** factores ordenados por impacto (ya vienen ordenados del backend) se muestran sin reordenar en el cliente.
 
 ---
