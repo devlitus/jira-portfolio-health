@@ -115,10 +115,10 @@ Tarea grande — subtareas:
 
 Archivo: `src/storage/configStore.js`
 
-- [ ] `getConfig()` / `saveConfig()` sobre KVS, clave `config:portfolio`.
-- [ ] Esquema de config: `{ selectedProjectKeys: string[], thresholds?: {...}, baselinePolicy: "first-snapshot" }`.
-- [ ] Defaults de thresholds según §14 (`healthy: 80, atRisk: 60`) y §11 (scope: 5/15/25%).
-- **DoD:** tests unitarios de round-trip con mock de KVS.
+- [x] `getConfig()` / `saveConfig()` sobre KVS, clave `config:portfolio`. → `src/storage/configStore.ts` (siguiendo la convención `.ts` del repo en vez de `.js`).
+- [x] Esquema de config: `{ selectedProjectKeys: string[], thresholds?: {...}, baselinePolicy: "first-snapshot" }`. → `PortfolioConfig`/`PortfolioConfigInput`; `getConfig()` rellena thresholds/baselinePolicy con los defaults si no fueron guardados.
+- [x] Defaults de thresholds según §14 (`healthy: 80, atRisk: 60`) y §11 (scope: 5/15/25%). → `DEFAULT_THRESHOLDS` / `DEFAULT_SCOPE_GROWTH_THRESHOLDS`.
+- **DoD:** tests unitarios de round-trip con mock de KVS. → `__tests__/configStore.test.ts` (4 tests, mock de `@forge/kvs`); `npm test`, `npm run lint`, `forge lint` y `tsc --noEmit` en verde.
 
 ### Tarea 1.5 — Pantalla de setup (selección de proyectos)
 
