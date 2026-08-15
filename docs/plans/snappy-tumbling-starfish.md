@@ -100,8 +100,8 @@ Sin referencia visual directa del mockup (`code.html` solo cubre Dashboard) — 
 
 ### Tarea E.1 — Header + Dimensiones
 
-- [ ] Header con nombre, `StatusBadge`, trend line (`data-mono`, formato `78 → 71 → 64 → 55 → 42`).
-- [ ] Lista de 5 dimensiones (`DimensionRow`) como card con divisores suaves, `status` por dimensión vía `StatusBadge`, "N/A — Insufficient data" para dimensiones nulas (§12/§24, sin penalizar datos faltantes).
+- [x] Header con nombre, `StatusBadge`, trend line (`data-mono`, formato `78 → 71 → 64 → 55 → 42`).
+- [x] Lista de 5 dimensiones (`DimensionRow`) como card con divisores suaves, `status` por dimensión vía `StatusBadge`, "N/A — Insufficient data" para dimensiones nulas (§12/§24, sin penalizar datos faltantes).
 - **DoD:** los 3 casos (`reason`/`reasonKind` ausente, `failed`, sin análisis) se distinguen visualmente igual que hoy en texto plano.
 
 ### Tarea E.2 — "Why?" y "Recommended actions"
