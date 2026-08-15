@@ -49,9 +49,9 @@ Objetivo: preparar el entorno y cerrar las decisiones de arquitectura antes de e
 
 ### Tarea 0.3 — Preparar tooling del repo
 
-- [ ] Instalar dependencias de desarrollo: `npm install --save-dev jest @forge/kvs` (kvs va en dependencies: ajustar según corresponda: `npm install @forge/kvs` y `npm install --save-dev jest`).
-- [ ] Configurar script `test` en `package.json` (`"test": "jest"`).
-- [ ] Crear estructura de carpetas de backend:
+- [x] Instalar dependencias de desarrollo: `npm install --save-dev jest @forge/kvs` (kvs va en dependencies: ajustar según corresponda: `npm install @forge/kvs` y `npm install --save-dev jest`).
+- [x] Configurar script `test` en `package.json` (`"test": "jest"`).
+- [x] Crear estructura de carpetas de backend:
 
   ```text
   src/
