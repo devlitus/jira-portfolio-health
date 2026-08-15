@@ -91,10 +91,10 @@ Objetivo: el usuario puede seleccionar proyectos, guardar esa configuración y e
 
 Archivo: `src/metrics/model.js`
 
-- [ ] Definir los tipos (JSDoc, vanilla JS) según §22: `Project`, `ProjectSnapshot`, `HealthFactor`, `NormalizedIssue`.
-- [ ] `NormalizedIssue` debe contener solo lo necesario: `key`, `statusCategory` (To Do / In Progress / Done), `assigneeId`, `dueDate`, `created`, `resolutionDate`, `storyPoints` (si existe), `labels`, `links` (blockedBy/blocks con dirección y timestamps), `history` (fechas de transición de estado, solo lo imprescindible para cycle time y reopened).
-- [ ] Función `normalizeIssue(jiraIssue) -> NormalizedIssue` que mapea la respuesta REST al modelo interno.
-- **DoD:** normalizer con test unitario sobre un JSON de ejemplo de la API de Jira.
+- [x] Definir los tipos (JSDoc, vanilla JS) según §22: `Project`, `ProjectSnapshot`, `HealthFactor`, `NormalizedIssue`. → `src/metrics/model.ts` (tipos TypeScript, siguiendo la convención `.ts` ya establecida en el repo en vez de JSDoc/vanilla JS).
+- [x] `NormalizedIssue` debe contener solo lo necesario: `key`, `statusCategory` (To Do / In Progress / Done), `assigneeId`, `dueDate`, `created`, `resolutionDate`, `storyPoints` (si existe), `labels`, `links` (blockedBy/blocks con dirección y timestamps), `history` (fechas de transición de estado, solo lo imprescindible para cycle time y reopened). → Jira no expone timestamp de creación del link en `issuelinks`; `IssueLink` guarda dirección + issue/proyecto relacionado y el timestamp/edad del bloqueo se calculará en Fase 2 (Tarea 2.5) como proxy vía changelog/`updated`.
+- [x] Función `normalizeIssue(jiraIssue) -> NormalizedIssue` que mapea la respuesta REST al modelo interno.
+- **DoD:** normalizer con test unitario sobre un JSON de ejemplo de la API de Jira. → `__tests__/normalizeIssue.test.ts` (6 tests, con fixtures reales/enriquecidos); `npm test` y `forge lint` en verde.
 
 ### Tarea 1.3 — Jira Integration Layer
 
