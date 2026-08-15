@@ -378,11 +378,11 @@ Tarea grande — subtareas:
 
 ### Tarea 6.4 — Permisos y seguridad (§24, §25)
 
-- [ ] Verificar que todas las llamadas a Jira usan `.asUser()` (ningún dato que el usuario no pueda ver).
-- [ ] Revisar scopes: eliminar los que no se usen (least privilege).
-- [ ] Auditoría de logs: ningún log con summaries/descripciones de issues.
-- [ ] Confirmar que no se envía nada a servicios externos.
-- **DoD:** checklist de seguridad completado; se puede usar la skill `forge-security-review` como apoyo.
+- [x] Verificar que todas las llamadas a Jira usan `.asUser()` (ningún dato que el usuario no pueda ver). → Los 3 resolvers interactivos (`getProjects`, `runAnalysis`, `loadDashboardEntries` compartida por `getDashboard`/`getAttentionQueue`/`getProjectDetail`, todos en `src/index.ts`) usan `asUser()`; única excepción `asApp()` en `src/triggers/dailySnapshot.ts` (scheduled trigger sin usuario interactivo que impersonar), ya justificada en `docs/architecture-decisions.md` #3. Evidencia completa en `docs/security-review.md` §1.
+- [x] Revisar scopes: eliminar los que no se usen (least privilege). → Los 3 scopes declarados en `manifest.yml` (`read:jira-work`, `read:jira-user`, `storage:app`) están en uso: `read:jira-user` es necesario para que `fields.assignee.accountId` venga poblado en la respuesta de `search/jql` (consumido por `computeCapacityMetrics`, §12) — no se lee ningún otro dato de usuario (`displayName`/`avatarUrl`/`emailAddress`, verificado por grep). Ninguno de los 3 sobra; no se elimina ninguno. Evidencia en `docs/security-review.md` §2.
+- [x] Auditoría de logs: ningún log con summaries/descripciones de issues. → Único archivo con `console.*` en todo `src/` es `src/triggers/dailySnapshot.ts` (3 líneas): solo `projectKey` + duración en ms + conteos (proyectos, alertas) — nunca `summary`, `description`, título de issue ni el `message` de una alerta/factor. Evidencia en `docs/security-review.md` §3.
+- [x] Confirmar que no se envía nada a servicios externos. → Sin `fetch`/`axios`/`XMLHttpRequest` ni URLs externas en `src/` (grep sin resultados); `manifest.yml` no declara `permissions.external.fetch` ni `remotes`; `package.json` solo depende del SDK de Forge + React (sin clientes HTTP ni SDKs de terceros). Evidencia en `docs/security-review.md` §4.
+- **DoD:** checklist de seguridad completado; se puede usar la skill `forge-security-review` como apoyo. → `docs/security-review.md` creado con evidencia por punto (usado como checklist manual el rule-routing del skill `forge-security-review`; su script empaquetado `run_static_analysis.ps1` no se pudo ejecutar — bug de binding de parámetros en PowerShell, documentado en la cabecera del archivo — y descarga un binario externo (`fsrt.exe`), así que la auditoría de abajo es manual vía lectura de código/`grep`, no su salida). Sin cambios de código: la arquitectura ya cumplía las 4 reglas desde fases anteriores. `npm test` (201/201), `npm run lint`, `tsc --noEmit` y `forge lint` en verde (sin diffs de código de producción).
 
 ### Tarea 6.5 — Telemetría mínima (§27)
 
@@ -396,8 +396,8 @@ Tarea grande — subtareas:
 - [ ] **6.6.a — Definition of Done (§29):** recorrer las 14 casillas una a una y evidenciar cada una.
 - [ ] **6.6.b — Tests:** suite completa en verde (`npm test`), incluidos los tests críticos de §30.
 - [ ] **6.6.c — Review:** ejecutar la skill `forge-app-review` (pre-release readiness) y resolver hallazgos bloqueantes.
-- [ ] **6.6.d — Deploy a staging/production:** `forge deploy --non-interactive -e production` e `forge install --non-interactive --upgrade ...` si hay cambios de scopes.
-- [ ] **6.6.e — README:** actualizar con qué hace la app, cómo instalarla y cómo desarrollar.
+- [ ] **6.6.d — NO realizar Deploy a staging/production:** `forge deploy --non-interactive -e production` e `forge install --non-interactive --upgrade ...` si hay cambios de scopes.
+- [ ] **6.6.e — README:** actualizar con qué hace la app
 - **DoD:** MVP instalado y funcionando en producción del sitio de desarrollo; §29 completo.
 
 ### Checkpoint Fase 6
