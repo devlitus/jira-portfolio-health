@@ -74,8 +74,8 @@ Objetivo: envolver la app en el sidebar/topbar del sistema de diseño, mapeado a
 
 ### Tarea C.2 — Tabla "Health by Project"
 
-- [ ] Migrar `ProjectRow`/tabla a los estilos de `code.html` (zebra, `data-mono` para score, `TrendBadge`, `StatusBadge`, sub-línea con `projectKey` en vez de "Lead").
-- [ ] Conservar el badge de alertas (`⚠`) existente, integrado al nuevo estilo de fila.
+- [x] Migrar `ProjectRow`/tabla a los estilos de `code.html` (zebra, `data-mono` para score, `TrendBadge`, `StatusBadge`, sub-línea con `projectKey` en vez de "Lead").
+- [x] Conservar el badge de alertas (`⚠`) existente, integrado al nuevo estilo de fila.
 - **DoD:** cada fila sigue siendo clicable (`onSelectProject`) y conserva los 3 casos de `reasonKind` (`no-analysis`/`failed`/`insufficient-data`).
 
 ### Tarea C.3 — Sección "Recent Alerts" (nueva, Adaptación 7)

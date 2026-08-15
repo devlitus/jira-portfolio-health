@@ -5,7 +5,9 @@
 // just rendering.
 import React from 'react';
 import type { DashboardProjectRow, DashboardStatusCounts, DashboardSummary } from '../../health/dashboard';
+import type { HealthStatus } from '../../metrics/model';
 import { StatusBadge } from './ui/StatusBadge';
+import { TrendBadge } from './ui/TrendBadge';
 
 // Bento hero card (Tarea C.1, DESIGN.md § Components "Health Progress Bars"):
 // one row per status with a dot, count and a proportional bar. `total` is the
@@ -93,32 +95,68 @@ const TopAttentionItem: React.FC<{ project: DashboardProjectRow }> = ({ project 
   </li>
 );
 
+// Status dot next to the score (Tarea C.2, code.html rows): same semantic
+// colors as StatusBadge/HEALTH_BAR_ROWS, just a smaller unlabeled dot.
+const STATUS_DOT_CLASS: Record<HealthStatus, string> = {
+  HEALTHY: 'bg-status-healthy',
+  AT_RISK: 'bg-status-at-risk',
+  CRITICAL: 'bg-status-critical',
+};
+
 const ProjectRow: React.FC<{
   project: DashboardProjectRow;
+  isEven: boolean;
   onSelectProject?: (projectKey: string) => void;
-}> = ({ project, onSelectProject }) => (
-  <tr>
-    <td>
+}> = ({ project, isEven, onSelectProject }) => (
+  <tr
+    className={`group transition-colors hover:bg-surface-container-low ${isEven ? 'bg-surface-slate/30' : ''} ${
+      onSelectProject ? 'cursor-pointer' : ''
+    }`}
+  >
+    <td className="p-4">
       {onSelectProject ? (
-        <button type="button" onClick={() => onSelectProject(project.projectKey)}>
+        <button
+          type="button"
+          onClick={() => onSelectProject(project.projectKey)}
+          className="font-label-bold text-label-bold text-text-heading transition-colors group-hover:text-primary"
+        >
           {project.projectName}
         </button>
       ) : (
-        project.projectName
+        <span className="font-label-bold text-label-bold text-text-heading">{project.projectName}</span>
       )}
       {project.alertCount > 0 && (
-        <span title={`${project.alertCount} alert${project.alertCount === 1 ? '' : 's'}`}> ⚠</span>
+        <span
+          className="ml-1 text-status-critical"
+          title={`${project.alertCount} alert${project.alertCount === 1 ? '' : 's'}`}
+        >
+          ⚠
+        </span>
+      )}
+      <div className="font-body-sm text-body-sm text-on-surface-variant">{project.projectKey}</div>
+    </td>
+    <td className="p-4 text-right">
+      {project.healthScore !== null && project.status ? (
+        <div className="flex items-center justify-end gap-2">
+          <div className={`h-2 w-2 rounded-full ${STATUS_DOT_CLASS[project.status]}`} />
+          <span className="font-data-mono text-data-mono font-bold text-text-heading">{project.healthScore}</span>
+        </div>
+      ) : (
+        <span className="font-data-mono text-data-mono text-on-surface-variant">N/A</span>
       )}
     </td>
-    <td>{project.healthScore ?? 'N/A'}</td>
-    <td>{project.trend}</td>
-    <td>
+    <td className="p-4 text-center">
+      <div className="inline-flex">
+        <TrendBadge trend={project.trend} />
+      </div>
+    </td>
+    <td className="p-4">
       {project.status ? (
         <StatusBadge status={project.status} />
       ) : project.reasonKind === 'failed' ? (
-        <span>Analysis unavailable — {project.reason}</span>
+        <span className="font-body-sm text-body-sm text-status-critical">Analysis unavailable — {project.reason}</span>
       ) : (
-        project.reason ?? 'N/A'
+        <span className="font-body-sm text-body-sm text-on-surface-variant">{project.reason ?? 'N/A'}</span>
       )}
     </td>
   </tr>
@@ -218,23 +256,36 @@ export const Dashboard: React.FC<DashboardProps> = ({
         )}
       </section>
 
-      <section>
-        <h2>Health by Project</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Project</th>
-              <th>Health</th>
-              <th>Trend</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {projects.map((project) => (
-              <ProjectRow key={project.projectKey} project={project} onSelectProject={onSelectProject} />
-            ))}
-          </tbody>
-        </table>
+      <section className="overflow-hidden rounded-xl border border-outline-variant bg-surface shadow-sm">
+        <div className="border-b border-outline-variant bg-surface-slate p-4">
+          <h2 className="font-headline-sm text-headline-sm uppercase text-text-heading">Health by Project</h2>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[600px] border-collapse text-left">
+            <thead>
+              <tr className="border-b border-outline-variant bg-surface">
+                <th className="p-4 font-headline-sm text-headline-sm uppercase text-on-surface-variant">Project</th>
+                <th className="p-4 text-right font-headline-sm text-headline-sm uppercase text-on-surface-variant">
+                  Health
+                </th>
+                <th className="p-4 text-center font-headline-sm text-headline-sm uppercase text-on-surface-variant">
+                  Trend
+                </th>
+                <th className="p-4 font-headline-sm text-headline-sm uppercase text-on-surface-variant">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-outline-variant/50">
+              {projects.map((project, index) => (
+                <ProjectRow
+                  key={project.projectKey}
+                  project={project}
+                  isEven={index % 2 === 1}
+                  onSelectProject={onSelectProject}
+                />
+              ))}
+            </tbody>
+          </table>
+        </div>
       </section>
     </section>
   );
