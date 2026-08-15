@@ -42,8 +42,8 @@ Objetivo: dejar la base de diseño (colores, tipografía, iconos, badges reutili
 
 ### Tarea A.3 — Consolidar `StatusBadge` y `TrendBadge`
 
-- [ ] Crear `src/frontend/components/ui/StatusBadge.tsx`, reemplazando las copias duplicadas de `STATUS_LABELS`/`STATUS_COLORS`/`StatusBadge` en `Dashboard.tsx` y `ProjectDetail.tsx` por un único componente (estilo "Status Chip": fondo sólido, texto blanco, `label-bold` uppercase).
-- [ ] Crear `src/frontend/components/ui/TrendBadge.tsx`, que convierte el string de tendencia (`↑`/`↓`/`→`/`—` de `src/health/trend.ts`) en el badge circular con color semántico del mockup.
+- [x] Crear `src/frontend/components/ui/StatusBadge.tsx`, reemplazando las copias duplicadas de `STATUS_LABELS`/`STATUS_COLORS`/`StatusBadge` en `Dashboard.tsx` y `ProjectDetail.tsx` por un único componente (estilo "Status Chip": fondo sólido, texto blanco, `label-bold` uppercase).
+- [x] Crear `src/frontend/components/ui/TrendBadge.tsx`, que convierte el string de tendencia (`↑`/`↓`/`→`/`—` de `src/health/trend.ts`) en el badge circular con color semántico del mockup.
 - **DoD:** `Dashboard.tsx` y `ProjectDetail.tsx` importan `StatusBadge` desde `ui/` (cero definiciones locales duplicadas); `TrendBadge` queda listo para usarse en la Fase C y D.
 
 ---

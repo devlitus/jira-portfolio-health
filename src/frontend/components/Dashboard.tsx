@@ -5,7 +5,7 @@
 // just rendering.
 import React from 'react';
 import type { DashboardProjectRow, DashboardSummary } from '../../health/dashboard';
-import type { HealthStatus } from '../../metrics/model';
+import { StatusBadge } from './ui/StatusBadge';
 
 interface DashboardProps {
   summary: DashboardSummary;
@@ -15,22 +15,6 @@ interface DashboardProps {
   onRerunAnalysis?: () => void;
   isRerunning?: boolean;
 }
-
-const STATUS_LABELS: Record<HealthStatus, string> = {
-  HEALTHY: 'Healthy',
-  AT_RISK: 'At Risk',
-  CRITICAL: 'Critical',
-};
-
-const STATUS_COLORS: Record<HealthStatus, string> = {
-  HEALTHY: '#00875A',
-  AT_RISK: '#FF8B00',
-  CRITICAL: '#DE350B',
-};
-
-const StatusBadge: React.FC<{ status: HealthStatus }> = ({ status }) => (
-  <span style={{ color: STATUS_COLORS[status], fontWeight: 600 }}>{STATUS_LABELS[status]}</span>
-);
 
 const TopAttentionItem: React.FC<{ project: DashboardProjectRow }> = ({ project }) => (
   <li>
@@ -121,7 +105,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         {topAttention.length === 0 ? (
           <p>No projects with a calculated health score yet.</p>
         ) : (
-          <ol className="flex gap-4">
+          <ol>
             {topAttention.map((project) => (
               <TopAttentionItem key={project.projectKey} project={project} />
             ))}

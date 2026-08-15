@@ -4,24 +4,12 @@
 // following the spec's ASCII mockup (§16, §17).
 import React from 'react';
 import type { DimensionDetail, DimensionName, ProjectDetail as ProjectDetailData } from '../../health/projectDetail';
-import type { HealthStatus } from '../../metrics/model';
+import { StatusBadge } from './ui/StatusBadge';
 
 interface ProjectDetailProps {
   detail: ProjectDetailData;
   onBack: () => void;
 }
-
-const STATUS_LABELS: Record<HealthStatus, string> = {
-  HEALTHY: 'Healthy',
-  AT_RISK: 'At Risk',
-  CRITICAL: 'Critical',
-};
-
-const STATUS_COLORS: Record<HealthStatus, string> = {
-  HEALTHY: '#00875A',
-  AT_RISK: '#FF8B00',
-  CRITICAL: '#DE350B',
-};
 
 const DIMENSION_LABELS: Record<DimensionName, string> = {
   schedule: 'Schedule',
@@ -30,10 +18,6 @@ const DIMENSION_LABELS: Record<DimensionName, string> = {
   capacity: 'Capacity',
   dependencies: 'Dependencies',
 };
-
-const StatusBadge: React.FC<{ status: HealthStatus }> = ({ status }) => (
-  <span style={{ color: STATUS_COLORS[status], fontWeight: 600 }}>{STATUS_LABELS[status]}</span>
-);
 
 const DimensionRow: React.FC<{ dimension: DimensionDetail }> = ({ dimension }) => (
   <li>
