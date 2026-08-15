@@ -327,10 +327,10 @@ Archivo: `src/triggers/dailySnapshot.js`
 
 ### Tarea 5.3 — Trends en UI
 
-- [ ] Resolver `getTrend(projectKey, days)` → serie de health scores.
-- [ ] Columna Trend del dashboard (↑/↓/→ comparando con snapshot de hace 7 días).
-- [ ] Línea de tendencia en Project Detail (§16: `78 → 71 → 64 → 55 → 42`); si el tiempo lo permite, `LineChart` de UI Kit.
-- **DoD:** con snapshots sembrados manualmente en KVS, la UI muestra tendencias correctas.
+- [x] Resolver `getTrend(projectKey, days)` → serie de health scores. → `src/index.ts`, resolver `getTrend`; delega en `getSnapshots` (Tarea 5.1.b) + la función pura `buildTrendSeries` (`src/health/trend.ts`, nuevo).
+- [x] Columna Trend del dashboard (↑/↓/→ comparando con snapshot de hace 7 días). → `computeTrendDirection()` en `src/health/trend.ts`: compara el health score actual contra el snapshot más reciente a ≤7 días (no exige coincidencia exacta de fecha, ante huecos de historial); `—` si falta el score actual o no hay snapshot de referencia con score. Calculado en `loadDashboardEntries()` (`src/index.ts`, ya compartido por `getDashboard`/`getAttentionQueue`/`getProjectDetail`) y expuesto en `DashboardEntry.trend` (`src/health/dashboard.ts`, campo opcional — `toRow()` cae al placeholder `—` si no se provee, sin romper los tests existentes).
+- [x] Línea de tendencia en Project Detail (§16: `78 → 71 → 64 → 55 → 42`); si el tiempo lo permite, `LineChart` de UI Kit. → `formatTrendLine()` en `src/health/trend.ts` sobre los últimos `TREND_LINE_POINTS = 5` snapshots; expuesto en `DashboardEntry.trendLine` y consumido por `buildProjectDetail()` (`src/health/projectDetail.ts`) como el campo `trend` que ya renderizaba `ProjectDetail.tsx` (Tarea 4.3, sin cambios de frontend necesarios). Sin `LineChart`: este repo usa Custom UI, no UI Kit (Tarea 1.5.c/`CLAUDE.md`), y el mockup del §16 es en sí una secuencia textual.
+- **DoD:** con snapshots sembrados manualmente en KVS, la UI muestra tendencias correctas. → `__tests__/trend.test.ts` (11 tests: `buildTrendSeries`, `computeTrendDirection` incluidos placeholders/huecos de historial, `formatTrendLine` incluido el ejemplo exacto del §16) + 2 tests nuevos en `dashboard.test.ts`/`projectDetail.test.ts` que verifican que `toRow`/`buildProjectDetail` usan el trend precalculado en vez del placeholder; `npm test` (147/147), `npm run lint`, `tsc --noEmit` y `forge lint` en verde. `npm run build` genera `static/main/bundle.js`; `forge deploy --non-interactive -e development` OK (v5.7.0, sin cambios de scopes → no requiere reinstalar). Verificación visual de las flechas de tendencia y la línea del Project Detail en el sitio de desarrollo (requiere varios días de snapshots reales o sembrados a mano en KVS) queda pendiente de que el usuario la haga o la pida explícitamente (igual que en las Tareas 0.1/1.5.d/3.5/4.1/4.3/4.4).
 
 ### Tarea 5.4 — Detección de deterioro
 

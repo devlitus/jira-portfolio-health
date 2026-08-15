@@ -11,10 +11,8 @@ import { DashboardEntry } from './dashboard';
 import { getStatus } from './status';
 import { DEFAULT_THRESHOLDS } from '../storage/configStore';
 import { Recommendation } from './recommendations';
+import { TREND_PLACEHOLDER } from './trend';
 
-// Trend requires historical snapshots, which don't exist until Fase 5
-// (Tarea 5.3) — same placeholder used by the Portfolio overview (Tarea 4.1.d).
-const TREND_PLACEHOLDER = '—';
 const NO_ANALYSIS_REASON = 'No analysis yet — run analysis to see this project.';
 
 export type DimensionName = 'schedule' | 'delivery' | 'scope' | 'capacity' | 'dependencies';
@@ -51,7 +49,8 @@ export interface ProjectDetail {
  * (Tarea 4.1's `toRow`).
  */
 export function buildProjectDetail(entry: DashboardEntry): ProjectDetail {
-  const { project, outcome } = entry;
+  const { project, outcome, trendLine } = entry;
+  const trend = trendLine ?? TREND_PLACEHOLDER;
 
   if (!outcome || !outcome.ok) {
     return {
@@ -59,7 +58,7 @@ export function buildProjectDetail(entry: DashboardEntry): ProjectDetail {
       projectName: project.name,
       healthScore: null,
       status: null,
-      trend: TREND_PLACEHOLDER,
+      trend,
       dimensions: DIMENSION_ORDER.map((name) => ({ name, score: null, status: null, factors: [] })),
       factors: [],
       recommendations: [],
@@ -84,7 +83,7 @@ export function buildProjectDetail(entry: DashboardEntry): ProjectDetail {
     projectName: project.name,
     healthScore: outcome.healthScore,
     status: outcome.status,
-    trend: TREND_PLACEHOLDER,
+    trend,
     dimensions,
     factors,
     recommendations: outcome.recommendations,

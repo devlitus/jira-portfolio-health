@@ -60,6 +60,18 @@ describe('buildProjectDetail (§16 Project Detail)', () => {
     expect(detail.reason).toBeUndefined();
   });
 
+  it('uses the resolver-precomputed trend line (Tarea 5.3, §16) instead of the placeholder when provided', () => {
+    const entry: DashboardEntry = {
+      project: project('PAY', 'Payments Platform'),
+      outcome: success('PAY', 42, 'CRITICAL'),
+      trendLine: '78 → 71 → 64 → 55 → 42',
+    };
+
+    const detail = buildProjectDetail(entry);
+
+    expect(detail.trend).toBe('78 → 71 → 64 → 55 → 42');
+  });
+
   it('maps each of the 5 dimensions with its score and a status derived from the §14 thresholds', () => {
     const entry: DashboardEntry = {
       project: project('PAY'),

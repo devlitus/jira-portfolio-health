@@ -17,8 +17,15 @@ import { buildAttentionQueue } from './health/attentionQueue';
 import type { AttentionQueueEntry } from './health/attentionQueue';
 import { buildProjectDetail } from './health/projectDetail';
 import type { ProjectDetail } from './health/projectDetail';
+import { buildTrendSeries, computeTrendDirection, formatTrendLine, TREND_LINE_POINTS } from './health/trend';
+import type { TrendPoint } from './health/trend';
+import { getSnapshots } from './storage/snapshotStore';
 
 const resolver = new Resolver();
+
+/** Buffer window for `loadDashboardEntries`'s trend lookups (Tarea 5.3): long enough to both find a
+ *  snapshot ~7 days back for the Trend column and supply the last `TREND_LINE_POINTS` for the detail line. */
+const TREND_HISTORY_DAYS = 14;
 
 resolver.define('getProjects', async (): Promise<Project[]> => {
   return listProjects(asUser());
@@ -58,10 +65,13 @@ resolver.define('runAnalysis', async (): Promise<ProjectAnalysisOutcome[]> => {
 
 /**
  * Reads the selected projects' names (Jira, so the UI reflects current
- * project names) and their latest cached analysis (KVS `latest:<projectKey>`,
- * written by `runAnalysis`) — no recomputation, so dashboard-derived views
- * stay fast (§24 Performance). Shared by `getDashboard` (Tarea 4.1) and
- * `getAttentionQueue` (Tarea 4.2), which reduce this same data differently.
+ * project names), their latest cached analysis (KVS `latest:<projectKey>`,
+ * written by `runAnalysis`) and their recent snapshot history (Tarea 5.1) —
+ * no recomputation, so dashboard-derived views stay fast (§24 Performance).
+ * Shared by `getDashboard` (Tarea 4.1), `getAttentionQueue` (Tarea 4.2) and
+ * `getProjectDetail` (Tarea 4.3), which reduce this same data differently;
+ * the trend column/line (Tarea 5.3) is precomputed here since it needs the
+ * snapshot KVS reads that the pure `health/*` modules don't do themselves.
  */
 async function loadDashboardEntries(): Promise<DashboardEntry[]> {
   const config = await getConfig();
@@ -71,8 +81,18 @@ async function loadDashboardEntries(): Promise<DashboardEntry[]> {
   return Promise.all(
     config.selectedProjectKeys.map(async (projectKey) => {
       const project = projectsByKey.get(projectKey) ?? { id: projectKey, key: projectKey, name: projectKey };
-      const outcome = await kvs.get<ProjectAnalysisOutcome>(`latest:${projectKey}`);
-      return { project, outcome: outcome ?? undefined };
+      const [outcome, snapshots] = await Promise.all([
+        kvs.get<ProjectAnalysisOutcome>(`latest:${projectKey}`),
+        getSnapshots(projectKey, TREND_HISTORY_DAYS),
+      ]);
+      const currentHealthScore = outcome && outcome.ok ? outcome.healthScore : null;
+
+      return {
+        project,
+        outcome: outcome ?? undefined,
+        trend: computeTrendDirection(currentHealthScore, snapshots),
+        trendLine: formatTrendLine(buildTrendSeries(snapshots.slice(-TREND_LINE_POINTS))),
+      };
     })
   );
 }
@@ -109,6 +129,20 @@ resolver.define('getProjectDetail', async (request): Promise<ProjectDetail> => {
   return buildProjectDetail(
     entry ?? { project: { id: projectKey, key: projectKey, name: projectKey }, outcome: undefined }
   );
+});
+
+/**
+ * Trend series (Tarea 5.3, §19): a project's stored health-score history,
+ * oldest first, straight from the snapshot store (Tarea 5.1) with no
+ * reduction — the dashboard's Trend column and the Project Detail trend line
+ * are precomputed from this same data in `loadDashboardEntries` above so the
+ * common screens don't need a second round trip; this resolver exists for
+ * callers that need the raw series itself.
+ */
+resolver.define('getTrend', async (request): Promise<TrendPoint[]> => {
+  const { projectKey, days } = request.payload as { projectKey: string; days?: number };
+  const snapshots = await getSnapshots(projectKey, days ?? TREND_HISTORY_DAYS);
+  return buildTrendSeries(snapshots);
 });
 
 export const handler = resolver.getDefinitions();

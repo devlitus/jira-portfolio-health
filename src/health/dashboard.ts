@@ -7,11 +7,8 @@
 
 import { HealthStatus, Project } from '../metrics/model';
 import { ProjectAnalysisOutcome } from './analyzeProject';
+import { TREND_PLACEHOLDER } from './trend';
 
-// Trend requires historical snapshots, which don't exist until Fase 5
-// (Tarea 5.3) — every row shows this placeholder for now (plan's own note
-// on Tarea 4.1.d).
-const TREND_PLACEHOLDER = '—';
 const TOP_ATTENTION_SIZE = 3;
 const NO_ANALYSIS_REASON = 'No analysis yet — run analysis to see this project.';
 
@@ -44,16 +41,20 @@ export interface DashboardEntry {
   project: Project;
   /** The cached `latest:<projectKey>` outcome, or undefined if none exists yet. */
   outcome: ProjectAnalysisOutcome | undefined;
+  /** Dashboard Trend column (↑/↓/→, Tarea 5.3), precomputed by the resolver from snapshot history. Defaults to the placeholder when omitted (e.g. in tests that don't care about trend). */
+  trend?: string;
+  /** Project Detail trend line (§16, Tarea 5.3), precomputed by the resolver from snapshot history. */
+  trendLine?: string;
 }
 
-function toRow({ project, outcome }: DashboardEntry): DashboardProjectRow {
+function toRow({ project, outcome, trend }: DashboardEntry): DashboardProjectRow {
   if (!outcome || !outcome.ok) {
     return {
       projectKey: project.key,
       projectName: project.name,
       healthScore: null,
       status: null,
-      trend: TREND_PLACEHOLDER,
+      trend: trend ?? TREND_PLACEHOLDER,
       reason: outcome && !outcome.ok ? outcome.reason : NO_ANALYSIS_REASON,
     };
   }
@@ -63,7 +64,7 @@ function toRow({ project, outcome }: DashboardEntry): DashboardProjectRow {
     projectName: project.name,
     healthScore: outcome.healthScore,
     status: outcome.status,
-    trend: TREND_PLACEHOLDER,
+    trend: trend ?? TREND_PLACEHOLDER,
   };
 }
 

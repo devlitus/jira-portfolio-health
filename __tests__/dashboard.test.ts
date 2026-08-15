@@ -104,6 +104,17 @@ describe('buildDashboardSummary (§7 Portfolio overview)', () => {
     expect(summary.projects[0].reason).toBe('Insufficient permissions');
   });
 
+  it('uses the resolver-precomputed trend (Tarea 5.3) instead of the placeholder when provided', () => {
+    const entries: DashboardEntry[] = [
+      { project: project('PAY', 'Payments Platform'), outcome: success('PAY', 42, 'CRITICAL'), trend: '↓' },
+      { project: project('AN', 'Analytics'), outcome: undefined, trend: '↑' },
+    ];
+
+    const summary = buildDashboardSummary(entries);
+
+    expect(summary.projects.map((p) => p.trend)).toEqual(['↓', '↑']);
+  });
+
   it('returns null overall health and an empty Top Attention when nothing is scored yet', () => {
     const entries: DashboardEntry[] = [{ project: project('PAY'), outcome: undefined }];
 
