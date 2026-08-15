@@ -102,14 +102,14 @@ Archivo: `src/jira/client.js`
 
 Tarea grande — subtareas:
 
-- [ ] **1.3.a — Listar proyectos:** `listProjects(asUserApi)` usando `GET /rest/api/3/project/search` con paginación. Devuelve `{ id, key, name }[]`.
-- [ ] **1.3.b — Obtener issues de un proyecto:** `getProjectIssues(projectKey)` usando `GET /rest/api/3/search/jql` (JQL: `project = <KEY>`), con:
+- [x] **1.3.a — Listar proyectos:** `listProjects(asUserApi)` usando `GET /rest/api/3/project/search` con paginación. Devuelve `{ id, key, name }[]`. → `src/jira/client.ts`, paginación `startAt`/`isLast`.
+- [x] **1.3.b — Obtener issues de un proyecto:** `getProjectIssues(projectKey)` usando `GET /rest/api/3/search/jql` (JQL: `project = <KEY>`), con:
   - campos mínimos: `summary,status,assignee,duedate,created,resolutiondate,customfield (story points),issuelinks`;
   - `expand=changelog` para transiciones de estado y reopened (§10, §11);
   - paginación completa (nextPageToken).
-- [ ] **1.3.c — Resiliencia:** manejo de errores por proyecto: si un proyecto falla (permisos, proyecto vacío), devolver `{ ok: false, reason }` en vez de lanzar excepción que tumbe todo el análisis (§24 Resilience).
-- [ ] **1.3.d — Rate limiting:** reintentos sencillos con backoff ante 429.
-- **DoD:** funciones cubiertas con tests unitarios (mock de `api.asUser()`), paginación y error paths probados.
+- [x] **1.3.c — Resiliencia:** manejo de errores por proyecto: si un proyecto falla (permisos, proyecto vacío), devolver `{ ok: false, reason }` en vez de lanzar excepción que tumbe todo el análisis (§24 Resilience). → `getProjectIssues` nunca lanza; captura respuestas no-ok y errores de red/fetch.
+- [x] **1.3.d — Rate limiting:** reintentos sencillos con backoff ante 429. → `requestJiraWithRetry` (hasta 3 reintentos, respeta `Retry-After` o backoff exponencial 250/500/1000ms).
+- **DoD:** funciones cubiertas con tests unitarios (mock de `api.asUser()`), paginación y error paths probados. → `__tests__/jiraClient.test.ts` (14 tests entre los dos suites); `npm test`, `npm run lint`, `forge lint` y `tsc --noEmit` en verde.
 
 ### Tarea 1.4 — Persistencia de configuración
 
