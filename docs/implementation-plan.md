@@ -148,10 +148,10 @@ Archivos: `src/metrics/schedule.js`, `src/metrics/delivery.js`, `src/metrics/sco
 
 ### Tarea 2.1 — Métricas de Schedule (§9)
 
-- [ ] `overdueRatio = overdueIssues / issuesWithDueDate` (si `issuesWithDueDate === 0` → métrica `null`, no 0 — §24 Resilience).
-- [ ] `completionRatio = doneIssues / totalIssues`.
-- [ ] Conteo de issues sin due date dentro del conjunto planificado.
-- **DoD:** tests con datasets sintéticos: proyecto sin atrasos, con atrasos, sin due dates (caso `null`).
+- [x] `overdueRatio = overdueIssues / issuesWithDueDate` (si `issuesWithDueDate === 0` → métrica `null`, no 0 — §24 Resilience). → `src/metrics/schedule.ts`, `computeScheduleMetrics()`.
+- [x] `completionRatio = doneIssues / totalIssues`. → Misma función; `null` si `totalIssues === 0` (mismo criterio de no-penalizar por falta de datos).
+- [x] Conteo de issues sin due date dentro del conjunto planificado. → `missingDueDateCount`: issues no-Done sin `dueDate`.
+- **DoD:** tests con datasets sintéticos: proyecto sin atrasos, con atrasos, sin due dates (caso `null`). → `__tests__/scheduleMetrics.test.ts` (5 tests); `npm test` (23/23), `npm run lint` y `tsc --noEmit` en verde.
 
 ### Tarea 2.2 — Métricas de Delivery (§10)
 
