@@ -224,8 +224,8 @@ Tarea grande — una subtarea por dimensión; cada una devuelve `{ score, factor
 
 ### Tarea 3.3 — Status thresholds (§14)
 
-- [ ] `getStatus(healthScore, thresholds) -> "HEALTHY" | "AT_RISK" | "CRITICAL"` con defaults 80/60 leídos de config.
-- **DoD:** tests de frontera (79/80/81, 59/60/61).
+- [x] `getStatus(healthScore, thresholds) -> "HEALTHY" | "AT_RISK" | "CRITICAL"` con defaults 80/60 leídos de config. → `src/health/status.ts`, `getStatus()`; usa `DEFAULT_THRESHOLDS` de `src/storage/configStore.ts` (Tarea 1.4) como valor por defecto del parámetro `thresholds`.
+- **DoD:** tests de frontera (79/80/81, 59/60/61). → `__tests__/status.test.ts` (4 tests: fronteras 80/60, extremos 0/100, thresholds personalizados); `npm test` (93/93), `npm run lint`, `tsc --noEmit` y `forge lint` en verde.
 
 ### Tarea 3.4 — Recommendation Engine (§17)
 
