@@ -40,11 +40,11 @@ Objetivo: preparar el entorno y cerrar las decisiones de arquitectura antes de e
 
 ### Tarea 0.2 — Decisiones de arquitectura (documentar en `docs/architecture-decisions.md`)
 
-- [ ] **Almacenamiento de snapshots:** usar Forge KVS (`@forge/kvs`) con clave `snapshot:<projectKey>:<yyyy-mm-dd>`. Decisión: KVS por simplicidad frente a SQL; volumen bajo (1 snapshot/proyecto/día). (§19, §22)
-- [ ] **Configuración del addon (proyectos seleccionados, thresholds):** KVS con clave `config:portfolio`. (§4.1, §14)
-- [ ] **Llamadas a Jira API:** desde resolvers de backend con `.asUser()` (respeta permisos del usuario, §24 Permissions, §25) — NO `requestJira` desde frontend, porque los cálculos pesados deben ejecutarse en backend y cachearse (§24 Performance).
-- [ ] **Snapshot diario:** módulo `scheduledTrigger` (cron diario) que recorre los proyectos seleccionados y persiste snapshots. (§19)
-- [ ] **Framework de tests:** Jest (estándar en proyectos Forge, funciona con nodejs24.x y módulos ESM del template).
+- [x] **Almacenamiento de snapshots:** usar Forge KVS (`@forge/kvs`) con clave `snapshot:<projectKey>:<yyyy-mm-dd>`. Decisión: KVS por simplicidad frente a SQL; volumen bajo (1 snapshot/proyecto/día). (§19, §22)
+- [x] **Configuración del addon (proyectos seleccionados, thresholds):** KVS con clave `config:portfolio`. (§4.1, §14)
+- [x] **Llamadas a Jira API:** desde resolvers de backend con `.asUser()` (respeta permisos del usuario, §24 Permissions, §25) — NO `requestJira` desde frontend, porque los cálculos pesados deben ejecutarse en backend y cachearse (§24 Performance).
+- [x] **Snapshot diario:** módulo `scheduledTrigger` (cron diario) que recorre los proyectos seleccionados y persiste snapshots. (§19)
+- [x] **Framework de tests:** Jest (estándar en proyectos Forge, funciona con nodejs24.x y módulos ESM del template).
 - **DoD:** documento creado con cada decisión y su justificación.
 
 ### Tarea 0.3 — Preparar tooling del repo
