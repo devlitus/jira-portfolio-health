@@ -371,10 +371,10 @@ Tarea grande — subtareas:
 
 ### Tarea 6.3 — Performance (§24)
 
-- [ ] Medir tiempo de carga del dashboard con 10+ proyectos (objetivo < 10 s; el dashboard lee de KVS, nunca recalcula).
-- [ ] Si el análisis completo es lento: paralelizar proyectos con `Promise.all` acotado en el resolver `runAnalysis`.
-- [ ] Revisar consumo de invocaciones del trigger (1 invocación/día que recorre proyectos — aceptable; documentar).
-- **DoD:** mediciones registradas en `docs/performance-notes.md`.
+- [x] Medir tiempo de carga del dashboard con 10+ proyectos (objetivo < 10 s; el dashboard lee de KVS, nunca recalcula). → `getDashboard`/`getAttentionQueue`/`getProjectDetail` confirmados sin llamadas a Jira ni recomputación (solo `loadDashboardEntries`, `src/index.ts`, leyendo KVS); paso de reducción en memoria medido con 25 proyectos sintéticos en `__tests__/performance.test.ts` (< 1 ms); medición registrada en `docs/performance-notes.md` §1. Medición de latencia KVS real con 10+ proyectos en el sitio de desarrollo queda pendiente de que el usuario la haga o la pida explícitamente (igual que en las Tareas 0.1/1.5.d/3.5/4.1/4.3/4.4/5.2/5.3/5.4/6.1/6.2).
+- [x] Si el análisis completo es lento: paralelizar proyectos con `Promise.all` acotado en el resolver `runAnalysis`. → Nueva `mapWithConcurrency()` en `src/jira/client.ts` (tests en `__tests__/jiraClient.test.ts`); `runAnalysis` (`src/index.ts`) la usa con `ANALYSIS_CONCURRENCY_LIMIT = 5`, documentado en `docs/performance-notes.md` §2.
+- [x] Revisar consumo de invocaciones del trigger (1 invocación/día que recorre proyectos — aceptable; documentar). → Documentado en `docs/performance-notes.md` §3: 1 invocación/día constante, no escala con el nº de proyectos.
+- **DoD:** mediciones registradas en `docs/performance-notes.md`. → `docs/performance-notes.md` creado; `npm test` (201/201), `npm run lint`, `tsc --noEmit` y `forge lint` en verde.
 
 ### Tarea 6.4 — Permisos y seguridad (§24, §25)
 

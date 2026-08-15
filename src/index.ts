@@ -5,7 +5,7 @@
 import Resolver from '@forge/resolver';
 import { asUser } from '@forge/api';
 import { kvs } from '@forge/kvs';
-import { listProjects } from './jira/client';
+import { listProjects, mapWithConcurrency } from './jira/client';
 import { getConfig, saveConfig } from './storage/configStore';
 import type { PortfolioConfig, PortfolioConfigInput } from './storage/configStore';
 import type { Project } from './metrics/model';
@@ -35,6 +35,10 @@ const resolver = new Resolver();
  *  and find the ~14-day-old snapshot the Attention Queue's deterioration check (Tarea 5.4) compares against. */
 const TREND_HISTORY_DAYS = 14;
 
+/** Bound on concurrent per-project analyses in `runAnalysis` (Tarea 6.3, §24 Performance)
+ *  — see `mapWithConcurrency` in `src/jira/client.ts` for the rationale. */
+const ANALYSIS_CONCURRENCY_LIMIT = 5;
+
 resolver.define('getProjects', async (): Promise<Project[]> => {
   return listProjects(asUser());
 });
@@ -63,13 +67,11 @@ resolver.define('runAnalysis', async (): Promise<ProjectAnalysisOutcome[]> => {
   const config = await getConfig();
   const api = asUser();
 
-  return Promise.all(
-    config.selectedProjectKeys.map(async (projectKey) => {
-      const result = await analyzeProject(api, projectKey, { thresholds: config.thresholds });
-      await kvs.set(`latest:${projectKey}`, result);
-      return result;
-    })
-  );
+  return mapWithConcurrency(config.selectedProjectKeys, ANALYSIS_CONCURRENCY_LIMIT, async (projectKey) => {
+    const result = await analyzeProject(api, projectKey, { thresholds: config.thresholds });
+    await kvs.set(`latest:${projectKey}`, result);
+    return result;
+  });
 });
 
 /**

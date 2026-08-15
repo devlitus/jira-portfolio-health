@@ -182,3 +182,36 @@ function retryDelayMs(response: APIResponse, attempt: number): number {
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+/**
+ * Runs `fn` over `items` with at most `limit` calls in flight at once,
+ * preserving result order (Tarea 6.3, §24 Performance). Used to shape
+ * portfolio-wide Jira load: each item here is a full per-project analysis
+ * (paginated issue search + changelog, Tarea 1.3.b), so an unbounded
+ * `Promise.all` across a 10+ project portfolio would fire that many
+ * simultaneously, compounding 429s beyond what the per-request retry
+ * (`requestJiraWithRetry` above, Tarea 1.3.d) is meant to absorb. Never
+ * throws itself — a rejection from `fn` propagates to the caller exactly as
+ * `Promise.all` would, since every caller of this (`analyzeProject`) already
+ * resolves failures as `{ ok: false, reason }` (§24 Resilience).
+ */
+export async function mapWithConcurrency<T, R>(
+  items: readonly T[],
+  limit: number,
+  fn: (item: T) => Promise<R>
+): Promise<R[]> {
+  const results: R[] = new Array(items.length);
+  let nextIndex = 0;
+
+  async function worker(): Promise<void> {
+    for (;;) {
+      const index = nextIndex++;
+      if (index >= items.length) return;
+      results[index] = await fn(items[index]);
+    }
+  }
+
+  const workerCount = Math.max(1, Math.min(limit, items.length));
+  await Promise.all(Array.from({ length: workerCount }, worker));
+  return results;
+}

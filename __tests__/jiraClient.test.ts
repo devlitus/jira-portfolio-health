@@ -1,4 +1,4 @@
-import { getProjectIssues, listProjects, JiraFetchApi } from '../src/jira/client';
+import { getProjectIssues, listProjects, mapWithConcurrency, JiraFetchApi } from '../src/jira/client';
 
 /** Minimal fake of @forge/api's APIResponse, enough for client.ts's needs. */
 function mockResponse(overrides: {
@@ -185,5 +185,59 @@ describe('rate limiting (429 retry with backoff)', () => {
     await assertion;
 
     expect(requestJira).toHaveBeenCalledTimes(4); // initial attempt + 3 retries
+  });
+});
+
+describe('mapWithConcurrency (Tarea 6.3, §24 Performance)', () => {
+  it('preserves result order regardless of completion order', async () => {
+    const delays = [30, 10, 20, 0];
+    const fn = (ms: number) => new Promise<number>((resolve) => setTimeout(() => resolve(ms), ms));
+
+    const results = await mapWithConcurrency(delays, 2, fn);
+
+    expect(results).toEqual(delays);
+  });
+
+  it('never runs more than `limit` calls concurrently', async () => {
+    let active = 0;
+    let maxActive = 0;
+    const items = Array.from({ length: 10 }, (_, i) => i);
+
+    await mapWithConcurrency(items, 3, async (item) => {
+      active += 1;
+      maxActive = Math.max(maxActive, active);
+      await new Promise((resolve) => setTimeout(resolve, 5));
+      active -= 1;
+      return item;
+    });
+
+    expect(maxActive).toBeLessThanOrEqual(3);
+  });
+
+  it('handles an empty list without invoking fn', async () => {
+    const fn = jest.fn();
+
+    const results = await mapWithConcurrency([], 5, fn);
+
+    expect(results).toEqual([]);
+    expect(fn).not.toHaveBeenCalled();
+  });
+
+  it('runs every item when the limit exceeds the item count', async () => {
+    const fn = jest.fn(async (item: string) => item.toUpperCase());
+
+    const results = await mapWithConcurrency(['a', 'b'], 10, fn);
+
+    expect(results).toEqual(['A', 'B']);
+    expect(fn).toHaveBeenCalledTimes(2);
+  });
+
+  it('propagates a rejection from fn to the caller', async () => {
+    const fn = async (item: number) => {
+      if (item === 2) throw new Error('boom');
+      return item;
+    };
+
+    await expect(mapWithConcurrency([1, 2, 3], 2, fn)).rejects.toThrow('boom');
   });
 });
