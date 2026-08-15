@@ -8,9 +8,17 @@
 import { HealthStatus, Project } from '../metrics/model';
 import { ProjectAnalysisOutcome } from './analyzeProject';
 import { TREND_PLACEHOLDER } from './trend';
+import { Alert } from './alerts';
 
 const TOP_ATTENTION_SIZE = 3;
+/** Cap on the dashboard's Alerts section (Tarea 6.1.d) — most recent first. */
+const ALERTS_PANEL_SIZE = 10;
 const NO_ANALYSIS_REASON = 'No analysis yet — run analysis to see this project.';
+
+/** An alert (§20) tagged with the project name for the dashboard's Alerts section. */
+export interface PortfolioAlert extends Alert {
+  projectName: string;
+}
 
 export interface DashboardProjectRow {
   projectKey: string;
@@ -20,6 +28,8 @@ export interface DashboardProjectRow {
   trend: string;
   /** Present when there's no score to show (analysis failed or never ran). */
   reason?: string;
+  /** Number of stored alerts (§20, Tarea 6.1) for this project — drives the dashboard's badge (Tarea 6.1.d). */
+  alertCount: number;
 }
 
 export interface DashboardStatusCounts {
@@ -35,6 +45,8 @@ export interface DashboardSummary {
   projects: DashboardProjectRow[];
   /** The worst `TOP_ATTENTION_SIZE` scored projects, ascending by health. */
   topAttention: DashboardProjectRow[];
+  /** Most recent stored alerts (§20, Tarea 6.1.d) across the selected projects, newest first. */
+  alerts: PortfolioAlert[];
 }
 
 export interface DashboardEntry {
@@ -47,9 +59,11 @@ export interface DashboardEntry {
   trendLine?: string;
   /** Health score change over the last 14 days (§18, Tarea 5.4), precomputed by the resolver from snapshot history. Null/undefined when there's no ~14-day-old snapshot to compare against. */
   deterioration?: number | null;
+  /** Stored alerts (§20, Tarea 6.1), precomputed by the resolver from the alert store. Defaults to none when omitted (e.g. in tests that don't care about alerts). */
+  alerts?: Alert[];
 }
 
-function toRow({ project, outcome, trend }: DashboardEntry): DashboardProjectRow {
+function toRow({ project, outcome, trend, alerts }: DashboardEntry): DashboardProjectRow {
   if (!outcome || !outcome.ok) {
     return {
       projectKey: project.key,
@@ -58,6 +72,7 @@ function toRow({ project, outcome, trend }: DashboardEntry): DashboardProjectRow
       status: null,
       trend: trend ?? TREND_PLACEHOLDER,
       reason: outcome && !outcome.ok ? outcome.reason : NO_ANALYSIS_REASON,
+      alertCount: alerts?.length ?? 0,
     };
   }
 
@@ -67,6 +82,7 @@ function toRow({ project, outcome, trend }: DashboardEntry): DashboardProjectRow
     healthScore: outcome.healthScore,
     status: outcome.status,
     trend: trend ?? TREND_PLACEHOLDER,
+    alertCount: alerts?.length ?? 0,
   };
 }
 
@@ -98,5 +114,12 @@ export function buildDashboardSummary(entries: DashboardEntry[]): DashboardSumma
     .sort((a, b) => a.healthScore - b.healthScore)
     .slice(0, TOP_ATTENTION_SIZE);
 
-  return { overallHealth, statusCounts, projects, topAttention };
+  const alerts = entries
+    .flatMap(({ project, alerts: projectAlerts }) =>
+      (projectAlerts ?? []).map((alert) => ({ ...alert, projectName: project.name }))
+    )
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, ALERTS_PANEL_SIZE);
+
+  return { overallHealth, statusCounts, projects, topAttention, alerts };
 }

@@ -123,4 +123,74 @@ describe('buildDashboardSummary (§7 Portfolio overview)', () => {
     expect(summary.overallHealth).toBeNull();
     expect(summary.topAttention).toEqual([]);
   });
+
+  describe('alerts (§20, Tarea 6.1.d)', () => {
+    it('defaults alertCount to 0 and the alerts panel to empty when no alerts were precomputed', () => {
+      const entries: DashboardEntry[] = [{ project: project('PAY'), outcome: success('PAY', 90, 'HEALTHY') }];
+
+      const summary = buildDashboardSummary(entries);
+
+      expect(summary.projects[0].alertCount).toBe(0);
+      expect(summary.alerts).toEqual([]);
+    });
+
+    it('carries each project alertCount onto its row for the dashboard badge', () => {
+      const entries: DashboardEntry[] = [
+        {
+          project: project('PAY', 'Payments Platform'),
+          outcome: success('PAY', 55, 'AT_RISK'),
+          alerts: [
+            { code: 'HEALTH_DROP', projectKey: 'PAY', date: '2026-08-15', message: 'Health score dropped 15 points' },
+          ],
+        },
+        { project: project('AN', 'Analytics'), outcome: success('AN', 90, 'HEALTHY'), alerts: [] },
+      ];
+
+      const summary = buildDashboardSummary(entries);
+
+      expect(summary.projects.find((p) => p.projectKey === 'PAY')?.alertCount).toBe(1);
+      expect(summary.projects.find((p) => p.projectKey === 'AN')?.alertCount).toBe(0);
+    });
+
+    it('flattens every project alerts into one panel, tagged with the project name, newest first', () => {
+      const entries: DashboardEntry[] = [
+        {
+          project: project('PAY', 'Payments Platform'),
+          outcome: success('PAY', 55, 'AT_RISK'),
+          alerts: [
+            { code: 'HEALTH_DROP', projectKey: 'PAY', date: '2026-08-13', message: 'Older alert' },
+          ],
+        },
+        {
+          project: project('AN', 'Analytics'),
+          outcome: success('AN', 40, 'CRITICAL'),
+          alerts: [
+            { code: 'AT_RISK_TO_CRITICAL', projectKey: 'AN', date: '2026-08-15', message: 'Newest alert' },
+          ],
+        },
+      ];
+
+      const summary = buildDashboardSummary(entries);
+
+      expect(summary.alerts.map((a) => a.message)).toEqual(['Newest alert', 'Older alert']);
+      expect(summary.alerts[0].projectName).toBe('Analytics');
+    });
+
+    it('caps the alerts panel at the 10 most recent alerts across all projects', () => {
+      const manyAlerts = Array.from({ length: 15 }, (_, i) => ({
+        code: 'HEALTH_DROP' as const,
+        projectKey: 'PAY',
+        date: `2026-08-${(i + 1).toString().padStart(2, '0')}`,
+        message: `Alert ${i + 1}`,
+      }));
+      const entries: DashboardEntry[] = [
+        { project: project('PAY'), outcome: success('PAY', 55, 'AT_RISK'), alerts: manyAlerts },
+      ];
+
+      const summary = buildDashboardSummary(entries);
+
+      expect(summary.alerts).toHaveLength(10);
+      expect(summary.alerts[0].message).toBe('Alert 15');
+    });
+  });
 });

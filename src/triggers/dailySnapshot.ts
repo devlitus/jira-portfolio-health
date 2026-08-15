@@ -13,17 +13,23 @@
 // Idempotent by construction: saveSnapshot() writes to the fixed key
 // `snapshot:<projectKey>:<yyyy-mm-dd>` (Tarea 5.1.a), so re-running this
 // trigger for the same day overwrites the same entry instead of duplicating
-// it (Tarea 5.2 "seguro ante re-ejecuciones").
+// it (Tarea 5.2 "seguro ante re-ejecuciones"). The same idempotency applies
+// to the alert evaluation added in Tarea 6.1.c below: a same-day re-run
+// compares today's snapshot against itself (fetched before the overwrite),
+// so no rule can spuriously re-fire from a re-run alone.
 //
 // Logs are limited to project key + timings (§25): never an issue summary,
 // description, or other issue content — only the outcome (saved / skipped)
-// and how long it took.
+// and how long it took. Alert log lines follow the same rule: only the rule
+// count, never an alert's message content.
 
 import { asApp } from '@forge/api';
 import { getConfig } from '../storage/configStore';
 import { analyzeProject } from '../health/analyzeProject';
-import { saveSnapshot } from '../storage/snapshotStore';
+import { getSnapshots, saveSnapshot } from '../storage/snapshotStore';
 import type { StoredSnapshot } from '../storage/snapshotStore';
+import { evaluateAlerts } from '../health/alerts';
+import { appendAlerts } from '../storage/alertStore';
 
 export const run = async (): Promise<void> => {
   const start = Date.now();
@@ -50,8 +56,18 @@ export const run = async (): Promise<void> => {
         totalIssues: outcome.totalIssues,
       };
 
+      const [previous] = await getSnapshots(projectKey, 1);
       await saveSnapshot(projectKey, storedSnapshot);
-      console.log(`dailySnapshot: saved snapshot for ${projectKey} (${elapsedMs}ms)`);
+
+      const alerts = evaluateAlerts(storedSnapshot, previous ?? null);
+      if (alerts.length > 0) {
+        await appendAlerts(projectKey, alerts);
+      }
+
+      console.log(
+        `dailySnapshot: saved snapshot for ${projectKey} (${elapsedMs}ms)` +
+          (alerts.length > 0 ? `, ${alerts.length} alert(s) triggered` : '')
+      );
     })
   );
 

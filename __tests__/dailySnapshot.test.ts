@@ -1,12 +1,14 @@
 jest.mock('@forge/api', () => ({ asApp: jest.fn() }));
 jest.mock('../src/storage/configStore', () => ({ getConfig: jest.fn() }));
 jest.mock('../src/health/analyzeProject', () => ({ analyzeProject: jest.fn() }));
-jest.mock('../src/storage/snapshotStore', () => ({ saveSnapshot: jest.fn() }));
+jest.mock('../src/storage/snapshotStore', () => ({ saveSnapshot: jest.fn(), getSnapshots: jest.fn() }));
+jest.mock('../src/storage/alertStore', () => ({ appendAlerts: jest.fn() }));
 
 import { asApp } from '@forge/api';
 import { getConfig } from '../src/storage/configStore';
 import { analyzeProject } from '../src/health/analyzeProject';
-import { saveSnapshot } from '../src/storage/snapshotStore';
+import { saveSnapshot, getSnapshots } from '../src/storage/snapshotStore';
+import { appendAlerts } from '../src/storage/alertStore';
 import { run } from '../src/triggers/dailySnapshot';
 import { DimensionResult } from '../src/metrics/model';
 import { DEFAULT_THRESHOLDS } from '../src/storage/configStore';
@@ -15,6 +17,8 @@ const mockedAsApp = asApp as jest.Mock;
 const mockedGetConfig = getConfig as jest.Mock;
 const mockedAnalyzeProject = analyzeProject as jest.Mock;
 const mockedSaveSnapshot = saveSnapshot as jest.Mock;
+const mockedGetSnapshots = getSnapshots as jest.Mock;
+const mockedAppendAlerts = appendAlerts as jest.Mock;
 
 const EMPTY_DIMENSION: DimensionResult = { score: null, factors: [] };
 const fakeApi = { requestJira: jest.fn() };
@@ -41,6 +45,7 @@ function successOutcome(projectKey: string, totalIssues = 5) {
 describe('dailySnapshot trigger', () => {
   beforeEach(() => {
     mockedAsApp.mockReturnValue(fakeApi);
+    mockedGetSnapshots.mockResolvedValue([]);
     jest.spyOn(console, 'log').mockImplementation(() => undefined);
   });
 
@@ -49,6 +54,8 @@ describe('dailySnapshot trigger', () => {
     mockedGetConfig.mockReset();
     mockedAnalyzeProject.mockReset();
     mockedSaveSnapshot.mockReset();
+    mockedGetSnapshots.mockReset();
+    mockedAppendAlerts.mockReset();
   });
 
   it('analyzes every selected project as the app and saves a snapshot per success', async () => {
@@ -121,5 +128,67 @@ describe('dailySnapshot trigger', () => {
     const loggedText = (console.log as jest.Mock).mock.calls.map((call) => call.join(' ')).join('\n');
     expect(loggedText).toContain('KAN');
     expect(loggedText).not.toMatch(/summary|description/i);
+  });
+
+  describe('alert evaluation (Tarea 6.1.c)', () => {
+    it('evaluates the new snapshot against the one fetched before saving, and persists any alert that fires', async () => {
+      mockedGetConfig.mockResolvedValue({
+        selectedProjectKeys: ['KAN'],
+        thresholds: DEFAULT_THRESHOLDS,
+        baselinePolicy: 'first-snapshot',
+      });
+      mockedAnalyzeProject.mockResolvedValue({ ...successOutcome('KAN'), healthScore: 65, status: 'AT_RISK' });
+      mockedGetSnapshots.mockResolvedValue([
+        {
+          projectKey: 'KAN',
+          date: '2026-08-14',
+          healthScore: 90,
+          status: 'HEALTHY',
+          totalIssues: 5,
+          dimensions: successOutcome('KAN').dimensions,
+        },
+      ]);
+
+      await run();
+
+      expect(mockedGetSnapshots).toHaveBeenCalledWith('KAN', 1);
+      expect(mockedAppendAlerts).toHaveBeenCalledTimes(1);
+      const [projectKey, alerts] = mockedAppendAlerts.mock.calls[0];
+      expect(projectKey).toBe('KAN');
+      expect(alerts.map((a: { code: string }) => a.code)).toEqual(
+        expect.arrayContaining(['HEALTH_DROP', 'HEALTHY_TO_AT_RISK'])
+      );
+    });
+
+    it('does not persist alerts when no rule fires', async () => {
+      mockedGetConfig.mockResolvedValue({
+        selectedProjectKeys: ['KAN'],
+        thresholds: DEFAULT_THRESHOLDS,
+        baselinePolicy: 'first-snapshot',
+      });
+      mockedAnalyzeProject.mockResolvedValue(successOutcome('KAN'));
+      mockedGetSnapshots.mockResolvedValue([]);
+
+      await run();
+
+      expect(mockedAppendAlerts).not.toHaveBeenCalled();
+    });
+
+    it('fetches the previous snapshot before overwriting it, for every project independently', async () => {
+      mockedGetConfig.mockResolvedValue({
+        selectedProjectKeys: ['KAN', 'OPS'],
+        thresholds: DEFAULT_THRESHOLDS,
+        baselinePolicy: 'first-snapshot',
+      });
+      mockedAnalyzeProject.mockImplementation((_api, projectKey: string) =>
+        Promise.resolve(successOutcome(projectKey))
+      );
+      mockedGetSnapshots.mockResolvedValue([]);
+
+      await run();
+
+      expect(mockedGetSnapshots).toHaveBeenCalledWith('KAN', 1);
+      expect(mockedGetSnapshots).toHaveBeenCalledWith('OPS', 1);
+    });
   });
 });

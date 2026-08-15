@@ -26,6 +26,7 @@ import {
 } from './health/trend';
 import type { TrendPoint } from './health/trend';
 import { getSnapshots } from './storage/snapshotStore';
+import { getAlerts } from './storage/alertStore';
 
 const resolver = new Resolver();
 
@@ -77,9 +78,9 @@ resolver.define('runAnalysis', async (): Promise<ProjectAnalysisOutcome[]> => {
  * no recomputation, so dashboard-derived views stay fast (§24 Performance).
  * Shared by `getDashboard` (Tarea 4.1), `getAttentionQueue` (Tarea 4.2) and
  * `getProjectDetail` (Tarea 4.3), which reduce this same data differently;
- * the trend column/line (Tarea 5.3) and the deterioration check (Tarea 5.4)
- * are precomputed here since they need the snapshot KVS reads that the pure
- * `health/*` modules don't do themselves.
+ * the trend column/line (Tarea 5.3), the deterioration check (Tarea 5.4) and
+ * the stored alerts (Tarea 6.1) are precomputed here since they need the KVS
+ * reads that the pure `health/*` modules don't do themselves.
  */
 async function loadDashboardEntries(): Promise<DashboardEntry[]> {
   const config = await getConfig();
@@ -89,9 +90,10 @@ async function loadDashboardEntries(): Promise<DashboardEntry[]> {
   return Promise.all(
     config.selectedProjectKeys.map(async (projectKey) => {
       const project = projectsByKey.get(projectKey) ?? { id: projectKey, key: projectKey, name: projectKey };
-      const [outcome, snapshots] = await Promise.all([
+      const [outcome, snapshots, alerts] = await Promise.all([
         kvs.get<ProjectAnalysisOutcome>(`latest:${projectKey}`),
         getSnapshots(projectKey, TREND_HISTORY_DAYS),
+        getAlerts(projectKey),
       ]);
       const currentHealthScore = outcome && outcome.ok ? outcome.healthScore : null;
 
@@ -101,6 +103,7 @@ async function loadDashboardEntries(): Promise<DashboardEntry[]> {
         trend: computeTrendDirection(currentHealthScore, snapshots),
         trendLine: formatTrendLine(buildTrendSeries(snapshots.slice(-TREND_LINE_POINTS))),
         deterioration: computeDeterioration(currentHealthScore, snapshots),
+        alerts,
       };
     })
   );

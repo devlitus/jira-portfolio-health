@@ -1,6 +1,8 @@
-// Portfolio overview (Tarea 4.1, §7, §26): executive header, Top Attention
-// and the Health by Project table. Reads the resolver's already-reduced
-// summary (src/health/dashboard.ts) — no computation here, just rendering.
+// Portfolio overview (Tarea 4.1, §7, §26): executive header, Alerts (§20,
+// Tarea 6.1.d), Top Attention and the Health by Project table (with a "⚠"
+// badge on rows that have stored alerts). Reads the resolver's
+// already-reduced summary (src/health/dashboard.ts) — no computation here,
+// just rendering.
 import React from 'react';
 import type { DashboardProjectRow, DashboardSummary } from '../../health/dashboard';
 import type { HealthStatus } from '../../metrics/model';
@@ -55,6 +57,9 @@ const ProjectRow: React.FC<{
       ) : (
         project.projectName
       )}
+      {project.alertCount > 0 && (
+        <span title={`${project.alertCount} alert${project.alertCount === 1 ? '' : 's'}`}> ⚠</span>
+      )}
     </td>
     <td>{project.healthScore ?? 'N/A'}</td>
     <td>{project.trend}</td>
@@ -68,7 +73,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onRerunAnalysis,
   isRerunning,
 }) => {
-  const { overallHealth, statusCounts, projects, topAttention } = summary;
+  const { overallHealth, statusCounts, projects, topAttention, alerts } = summary;
 
   return (
     <section>
@@ -86,6 +91,21 @@ export const Dashboard: React.FC<DashboardProps> = ({
         <p>
           {statusCounts.critical} Critical · {statusCounts.atRisk} At Risk · {statusCounts.healthy} On Track
         </p>
+      </section>
+
+      <section>
+        <h2>Alerts</h2>
+        {alerts.length === 0 ? (
+          <p>No alerts.</p>
+        ) : (
+          <ul>
+            {alerts.map((alert, index) => (
+              <li key={`${alert.projectKey}-${alert.code}-${alert.date}-${index}`}>
+                <strong>{alert.projectName}</strong>: {alert.message} ({alert.date})
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       <section>
