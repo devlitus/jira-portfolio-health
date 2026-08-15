@@ -215,12 +215,12 @@ Archivos: `src/health/score.js`, `src/health/dimensions.js`, `src/health/factors
 
 Tarea grande — una subtarea por dimensión; cada una devuelve `{ score, factors: HealthFactor[] }` (estructura JSON del §15):
 
-- [ ] **3.2.a — Schedule score:** penalizaciones por `overdueRatio` y completion estancada. Escala orientativa §9 (100 sin señales → 20 retraso crítico). Factores tipo `OVERDUE_ISSUES` con `impact` y `message`.
-- [ ] **3.2.b — Delivery score:** esquema de penalizaciones §10 (-20 throughput bajando >20%, -10 reopened elevado, -10 issues envejecidos).
-- [ ] **3.2.c — Scope score:** thresholds §11 (0–5% healthy, 5–15% warning, 15–25% risk, >25% crítico). DoD incluye test §30 "Scope creep" (30% → score ≤ 40).
-- [ ] **3.2.d — Capacity score:** según `workloadSignal`; `null` si no hay datos.
-- [ ] **3.2.e — Dependencies score:** penalización por `blockedCount` y `blockedAge` (> 5 días). DoD incluye test §30 "Blocked dependencies".
-- **DoD global:** cada score lleva sus factores explicables; mensajes en inglés (convención del repo) listos para mostrar en UI.
+- [x] **3.2.a — Schedule score:** penalizaciones por `overdueRatio` y completion estancada. Escala orientativa §9 (100 sin señales → 20 retraso crítico). Factores tipo `OVERDUE_ISSUES` con `impact` y `message`. → `src/health/dimensions.ts`, `computeScheduleScore()`; tiers 0.10/0.25/0.50 → -20/-40/-60/-80, más `STALLED_COMPLETION` (-10) si hay atrasos y `completionRatio < 10%`; `null` si ningún issue tiene due date.
+- [x] **3.2.b — Delivery score:** esquema de penalizaciones §10 (-20 throughput bajando >20%, -10 reopened elevado, -10 issues envejecidos). → `computeDeliveryScore()`; `null` si no hay actividad (`completedIssuesCount === 0 && inProgressIssuesCount === 0`).
+- [x] **3.2.c — Scope score:** thresholds §11 (0–5% healthy, 5–15% warning, 15–25% risk, >25% crítico). DoD incluye test §30 "Scope creep" (30% → score ≤ 40). → `computeScopeScore()` (100/75/50/25 por banda); test verifica 30% → 25.
+- [x] **3.2.d — Capacity score:** según `workloadSignal`; `null` si no hay datos. → `computeCapacityScore()`: HIGH → 40 con factor `CAPACITY_OVERLOAD`; NORMAL/LOW → 100; `ok: false` (datos insuficientes) → `null`.
+- [x] **3.2.e — Dependencies score:** penalización por `blockedCount` y `blockedAge` (> 5 días). DoD incluye test §30 "Blocked dependencies". → `computeDependenciesScore()`: -8/bloqueo, -12/bloqueo envejecido (>5 días), -5 por proyecto dependiente externo (tope -15); test verifica 5 bloqueados + 3 envejecidos → score ≤ 50.
+- **DoD global:** cada score lleva sus factores explicables; mensajes en inglés (convención del repo) listos para mostrar en UI. → `__tests__/dimensionScores.test.ts` (27 tests); `npm test` (89/89), `npm run lint`, `tsc --noEmit` y `forge lint` en verde.
 
 ### Tarea 3.3 — Status thresholds (§14)
 
