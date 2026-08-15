@@ -49,6 +49,8 @@ After creating the app ALWAYS review the contents of the app directory before ed
 
 # UI Development
 
+`docs\architecture-decisions.md` contains a set of architecture decisions for the Jira Portfolio Health app, including storage choices, configuration management, API call strategies, snapshot scheduling, and testing frameworks. These decisions are made to ensure efficient data handling, security compliance, and performance optimization in the app's backend architecture.
+
 The front-end of you app is built on Atlassian UI Kit, which has some similarities to React, but does not support all React features.
 You MUST NOT use common React components such as <div>, <strong>, etc. This will cause the app not to render.
 Instead, you MUST ONLY use components exported by UI Kit, which are: Badge, BarChart, Box, Button, ButtonGroup, Calendar, Checkbox, Code, CodeBlock, DatePicker, EmptyState, ErrorMessage, Form, FormFooter, FormHeader, FormSection, Heading, HelperMessage, HorizontalBarChart, HorizontalStackBarChart, Icon, Inline, Label, LineChart, LinkButton, List, ListItem, LoadingButton, Lozenge, Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle, ModalTransition, PieChart, ProgressBar, ProgressTracker, Radio, RadioGroup, Range, Select, SectionMessage, SectionMessageAction, SingleValueChart, Spinner, Stack, StackBarChart, Tab, TabList, TabPanel, Tabs, Tag, TagGroup, TextArea, Textfield, TimePicker, Toggle, Tooltip, Text, ValidMessage, RequiredAsterisk, Image, Link, UserPicker, User, UserGroup, Em, Strike, Strong, Frame, DynamicTable, InlineEdit, Popup, AdfRenderer
