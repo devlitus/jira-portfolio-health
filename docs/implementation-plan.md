@@ -82,10 +82,10 @@ Objetivo: el usuario puede seleccionar proyectos, guardar esa configuración y e
 
 ### Tarea 1.1 — Definir scopes y manifest
 
-- [ ] Añadir scopes mínimos en `manifest.yml`: `read:jira-work`, `read:jira-user` (revisar con `forge lint`; añadir `storage:app` lo gestiona KVS automáticamente al importarlo — validar con lint).
-- [ ] Añadir módulo `scheduledTrigger` (diario, p. ej. a las 06:00) con su función asociada (el handler puede ser un stub por ahora).
-- [ ] Ejecutar `forge lint`, `forge deploy --non-interactive -e development` y `forge install --non-interactive --upgrade ...` (obligatorio al añadir scopes).
-- **DoD:** manifest válido con scopes y trigger desplegado.
+- [x] Añadir scopes mínimos en `manifest.yml`: `read:jira-work`, `read:jira-user` (revisar con `forge lint`; añadir `storage:app` lo gestiona KVS automáticamente al importarlo — validar con lint). → Ya presentes en `manifest.yml`; `forge lint` no reporta necesidad de `storage:app` explícito.
+- [x] Añadir módulo `scheduledTrigger` (diario, p. ej. a las 06:00) con su función asociada (el handler puede ser un stub por ahora). → `scheduledTrigger` (`interval: day`) + función `daily-snapshot` → `triggers/dailySnapshot.run` (stub) ya en `manifest.yml`/`src/triggers/dailySnapshot.ts`.
+- [x] Ejecutar `forge lint`, `forge deploy --non-interactive -e development` y `forge install --non-interactive --upgrade ...` (obligatorio al añadir scopes). → Lint OK; deploy OK (v4.2.0); install --upgrade: "Site is already at the latest version".
+- **DoD:** manifest válido con scopes y trigger desplegado. → Verificado por CLI (lint + deploy + install --upgrade).
 
 ### Tarea 1.2 — Modelo interno de datos (Data Normalizer)
 
