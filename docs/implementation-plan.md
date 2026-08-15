@@ -188,8 +188,8 @@ Tarea grande — subtareas:
 
 Archivo: `src/metrics/index.js`
 
-- [ ] `computeProjectMetrics(normalizedIssues, baseline) -> ProjectMetrics` que agrupa las 5 dimensiones y nunca lanza excepción por datos faltantes (cada dimensión devuelve métricas o `null`).
-- **DoD:** test de integración con un dataset sintético completo.
+- [x] `computeProjectMetrics(normalizedIssues, baseline) -> ProjectMetrics` que agrupa las 5 dimensiones y nunca lanza excepción por datos faltantes (cada dimensión devuelve métricas o `null`). → `src/metrics/index.ts`; firma extendida a `(issues, projectKey, baselineScope, now?)` porque `computeDependenciesMetrics` (Tarea 2.5) requiere `projectKey`; cada dimensión se ejecuta con `safeCompute` (try/catch → `null`) para que un fallo inesperado en una no tumbe las demás.
+- **DoD:** test de integración con un dataset sintético completo. → `__tests__/projectMetrics.test.ts` (2 tests: dataset completo con las 5 dimensiones + caso sin issues); `npm test` (55/55), `npm run lint`, `tsc --noEmit` y `forge lint` en verde.
 
 ### Checkpoint Fase 2
 
