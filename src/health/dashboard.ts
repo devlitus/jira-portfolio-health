@@ -14,11 +14,21 @@ const TOP_ATTENTION_SIZE = 3;
 /** Cap on the dashboard's Alerts section (Tarea 6.1.d) — most recent first. */
 const ALERTS_PANEL_SIZE = 10;
 const NO_ANALYSIS_REASON = 'No analysis yet — run analysis to see this project.';
+const INSUFFICIENT_DATA_REASON = 'N/A — Insufficient data';
 
 /** An alert (§20) tagged with the project name for the dashboard's Alerts section. */
 export interface PortfolioAlert extends Alert {
   projectName: string;
 }
+
+/**
+ * Why a row has no score (Tarea 6.2, §26 empty/error states) — lets the
+ * frontend render a distinct headline per case ("Analysis unavailable" for a
+ * failed run, "N/A — Insufficient data" when the run succeeded but the
+ * project simply has no computable signal, §24 "don't penalize missing
+ * data") instead of a single generic "N/A".
+ */
+export type UnscoredReason = 'no-analysis' | 'failed' | 'insufficient-data';
 
 export interface DashboardProjectRow {
   projectKey: string;
@@ -26,8 +36,10 @@ export interface DashboardProjectRow {
   healthScore: number | null;
   status: HealthStatus | null;
   trend: string;
-  /** Present when there's no score to show (analysis failed or never ran). */
+  /** Present when there's no score to show (analysis failed, never ran, or ran but found nothing to score). */
   reason?: string;
+  /** Categorizes `reason` for the frontend (Tarea 6.2); absent when the row has a score. */
+  reasonKind?: UnscoredReason;
   /** Number of stored alerts (§20, Tarea 6.1) for this project — drives the dashboard's badge (Tarea 6.1.d). */
   alertCount: number;
 }
@@ -64,26 +76,35 @@ export interface DashboardEntry {
 }
 
 function toRow({ project, outcome, trend, alerts }: DashboardEntry): DashboardProjectRow {
-  if (!outcome || !outcome.ok) {
-    return {
-      projectKey: project.key,
-      projectName: project.name,
-      healthScore: null,
-      status: null,
-      trend: trend ?? TREND_PLACEHOLDER,
-      reason: outcome && !outcome.ok ? outcome.reason : NO_ANALYSIS_REASON,
-      alertCount: alerts?.length ?? 0,
-    };
-  }
-
-  return {
+  const base = {
     projectKey: project.key,
     projectName: project.name,
-    healthScore: outcome.healthScore,
-    status: outcome.status,
     trend: trend ?? TREND_PLACEHOLDER,
     alertCount: alerts?.length ?? 0,
   };
+
+  if (!outcome) {
+    return { ...base, healthScore: null, status: null, reason: NO_ANALYSIS_REASON, reasonKind: 'no-analysis' };
+  }
+
+  if (!outcome.ok) {
+    return { ...base, healthScore: null, status: null, reason: outcome.reason, reasonKind: 'failed' };
+  }
+
+  if (outcome.healthScore === null) {
+    // The run succeeded but every dimension came back null (e.g. no issues
+    // to analyze yet) — not a failure, just nothing to score (§24 Resilience:
+    // never treat missing data as a penalty).
+    return {
+      ...base,
+      healthScore: null,
+      status: null,
+      reason: INSUFFICIENT_DATA_REASON,
+      reasonKind: 'insufficient-data',
+    };
+  }
+
+  return { ...base, healthScore: outcome.healthScore, status: outcome.status };
 }
 
 /**

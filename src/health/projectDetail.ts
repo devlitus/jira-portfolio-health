@@ -7,7 +7,7 @@
 // No I/O here — the resolver (src/index.ts) is the only thing that touches KVS.
 
 import { HealthFactor, HealthStatus } from '../metrics/model';
-import { DashboardEntry } from './dashboard';
+import { DashboardEntry, UnscoredReason } from './dashboard';
 import { getStatus } from './status';
 import { DEFAULT_THRESHOLDS } from '../storage/configStore';
 import { Recommendation } from './recommendations';
@@ -40,6 +40,8 @@ export interface ProjectDetail {
   recommendations: Recommendation[];
   /** Present when there's no analysis to show (never ran, or the last run failed). */
   reason?: string;
+  /** Categorizes `reason` for the frontend (Tarea 6.2), same as the dashboard row. */
+  reasonKind?: Extract<UnscoredReason, 'no-analysis' | 'failed'>;
 }
 
 /**
@@ -63,6 +65,7 @@ export function buildProjectDetail(entry: DashboardEntry): ProjectDetail {
       factors: [],
       recommendations: [],
       reason: outcome && !outcome.ok ? outcome.reason : NO_ANALYSIS_REASON,
+      reasonKind: outcome && !outcome.ok ? 'failed' : 'no-analysis',
     };
   }
 

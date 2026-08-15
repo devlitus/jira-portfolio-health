@@ -157,12 +157,13 @@ describe('buildProjectDetail (§16 Project Detail)', () => {
     expect(detail.healthScore).toBeNull();
     expect(detail.status).toBeNull();
     expect(detail.reason).toMatch(/no analysis yet/i);
+    expect(detail.reasonKind).toBe('no-analysis');
     expect(detail.dimensions.every((d) => d.score === null && d.status === null)).toBe(true);
     expect(detail.factors).toEqual([]);
     expect(detail.recommendations).toEqual([]);
   });
 
-  it('surfaces a failed analysis with its own reason', () => {
+  it('surfaces a failed analysis with its own reason (Tarea 6.2 "Analysis unavailable")', () => {
     const entry: DashboardEntry = {
       project: project('PAY', 'Payments Platform'),
       outcome: failure('PAY', 'Insufficient permissions'),
@@ -171,6 +172,21 @@ describe('buildProjectDetail (§16 Project Detail)', () => {
     const detail = buildProjectDetail(entry);
 
     expect(detail.reason).toBe('Insufficient permissions');
+    expect(detail.reasonKind).toBe('failed');
     expect(detail.healthScore).toBeNull();
+  });
+
+  it('marks a successful run with no computable score as N/A per dimension, without a top-level failure reason (Tarea 6.2, §24)', () => {
+    const entry: DashboardEntry = {
+      project: project('PAY', 'Payments Platform'),
+      outcome: success('PAY', 50, 'AT_RISK', { healthScore: null, status: null }),
+    };
+
+    const detail = buildProjectDetail(entry);
+
+    expect(detail.healthScore).toBeNull();
+    expect(detail.status).toBeNull();
+    expect(detail.reason).toBeUndefined();
+    expect(detail.dimensions.every((d) => d.score === null && d.status === null)).toBe(true);
   });
 });

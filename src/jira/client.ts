@@ -118,10 +118,7 @@ export async function getProjectIssues(
 
       const response = await requestJiraWithRetry(api, route`/rest/api/3/search/jql?${params}`);
       if (!response.ok) {
-        return {
-          ok: false,
-          reason: `Jira API returned ${response.status} ${response.statusText} for project ${projectKey}`,
-        };
+        return { ok: false, reason: describeIssuesFailure(response, projectKey) };
       }
 
       const data = (await response.json()) as JiraIssueSearchResponse;
@@ -136,6 +133,23 @@ export async function getProjectIssues(
       reason: error instanceof Error ? error.message : `Unknown error fetching project ${projectKey}`,
     };
   }
+}
+
+/**
+ * Turns a failed `search/jql` response into a per-project failure reason.
+ * 401/403/404 get a plain-English message (§26 error states — "mensaje
+ * claro al usuario" for insufficient permissions); any other status falls
+ * back to the raw Jira status, which is enough detail for the remaining
+ * (unexpected/transient) cases.
+ */
+function describeIssuesFailure(response: APIResponse, projectKey: string): string {
+  if (response.status === 401 || response.status === 403) {
+    return `You don't have permission to view project ${projectKey} in Jira.`;
+  }
+  if (response.status === 404) {
+    return `Project ${projectKey} was not found or is no longer accessible.`;
+  }
+  return `Jira API returned ${response.status} ${response.statusText} for project ${projectKey}`;
 }
 
 /**

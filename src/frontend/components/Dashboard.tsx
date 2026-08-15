@@ -63,7 +63,15 @@ const ProjectRow: React.FC<{
     </td>
     <td>{project.healthScore ?? 'N/A'}</td>
     <td>{project.trend}</td>
-    <td>{project.status ? <StatusBadge status={project.status} /> : project.reason ?? 'N/A'}</td>
+    <td>
+      {project.status ? (
+        <StatusBadge status={project.status} />
+      ) : project.reasonKind === 'failed' ? (
+        <span>Analysis unavailable — {project.reason}</span>
+      ) : (
+        project.reason ?? 'N/A'
+      )}
+    </td>
   </tr>
 );
 

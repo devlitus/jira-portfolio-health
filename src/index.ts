@@ -51,10 +51,13 @@ resolver.define('saveConfig', async (request): Promise<PortfolioConfig> => {
 
 /**
  * Runs the full analysis pipeline (Tarea 3.5) for every selected project and
- * caches each successful result at KVS key `latest:<projectKey>`, so the
- * dashboard (Fase 4) can read cached results instead of recomputing on every
- * load (§24 Performance). A per-project failure is returned alongside the
- * successes rather than aborting the whole run (§24 Resilience).
+ * caches each result — success or failure — at KVS key `latest:<projectKey>`,
+ * so the dashboard (Fase 4) can read cached results instead of recomputing on
+ * every load (§24 Performance). A per-project failure is returned alongside
+ * the successes rather than aborting the whole run (§24 Resilience), and is
+ * cached too (Tarea 6.2): otherwise a project that just failed would keep
+ * showing its last successful score, or "no analysis yet" if it never had
+ * one, instead of surfacing as "Analysis unavailable".
  */
 resolver.define('runAnalysis', async (): Promise<ProjectAnalysisOutcome[]> => {
   const config = await getConfig();
@@ -63,9 +66,7 @@ resolver.define('runAnalysis', async (): Promise<ProjectAnalysisOutcome[]> => {
   return Promise.all(
     config.selectedProjectKeys.map(async (projectKey) => {
       const result = await analyzeProject(api, projectKey, { thresholds: config.thresholds });
-      if (result.ok) {
-        await kvs.set(`latest:${projectKey}`, result);
-      }
+      await kvs.set(`latest:${projectKey}`, result);
       return result;
     })
   );

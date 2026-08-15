@@ -88,13 +88,56 @@ describe('getProjectIssues', () => {
     expect(secondCallUrl).toContain('nextPageToken=tok-2');
   });
 
-  it('returns { ok: false } instead of throwing when Jira denies access to the project', async () => {
+  it('returns a clear permission message (not the raw HTTP status) on a 403', async () => {
     const requestJira = jest.fn().mockResolvedValue(mockResponse({ ok: false, status: 403, statusText: 'Forbidden' }));
     const api: JiraFetchApi = { requestJira };
 
     const result = await getProjectIssues(api, 'SECRET');
 
-    expect(result).toEqual({ ok: false, reason: 'Jira API returned 403 Forbidden for project SECRET' });
+    expect(result).toEqual({
+      ok: false,
+      reason: "You don't have permission to view project SECRET in Jira.",
+    });
+  });
+
+  it('returns the same clear permission message on a 401', async () => {
+    const requestJira = jest
+      .fn()
+      .mockResolvedValue(mockResponse({ ok: false, status: 401, statusText: 'Unauthorized' }));
+    const api: JiraFetchApi = { requestJira };
+
+    const result = await getProjectIssues(api, 'SECRET');
+
+    expect(result).toEqual({
+      ok: false,
+      reason: "You don't have permission to view project SECRET in Jira.",
+    });
+  });
+
+  it('returns a clear "not found" message on a 404', async () => {
+    const requestJira = jest.fn().mockResolvedValue(mockResponse({ ok: false, status: 404, statusText: 'Not Found' }));
+    const api: JiraFetchApi = { requestJira };
+
+    const result = await getProjectIssues(api, 'GONE');
+
+    expect(result).toEqual({
+      ok: false,
+      reason: 'Project GONE was not found or is no longer accessible.',
+    });
+  });
+
+  it('falls back to the raw Jira status for other failures', async () => {
+    const requestJira = jest
+      .fn()
+      .mockResolvedValue(mockResponse({ ok: false, status: 500, statusText: 'Internal Server Error' }));
+    const api: JiraFetchApi = { requestJira };
+
+    const result = await getProjectIssues(api, 'KAN');
+
+    expect(result).toEqual({
+      ok: false,
+      reason: 'Jira API returned 500 Internal Server Error for project KAN',
+    });
   });
 
   it('returns { ok: false } instead of throwing on a network/unexpected error', async () => {

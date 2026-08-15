@@ -89,10 +89,11 @@ describe('buildDashboardSummary (§7 Portfolio overview)', () => {
     expect(payRow?.healthScore).toBeNull();
     expect(payRow?.status).toBeNull();
     expect(payRow?.reason).toMatch(/no analysis yet/i);
+    expect(payRow?.reasonKind).toBe('no-analysis');
     expect(summary.topAttention).toHaveLength(1);
   });
 
-  it('surfaces a failed analysis with its reason instead of a score', () => {
+  it('surfaces a failed analysis with its reason instead of a score (Tarea 6.2 "Analysis unavailable")', () => {
     const entries: DashboardEntry[] = [
       { project: project('PAY', 'Payments Platform'), outcome: failure('PAY', 'Insufficient permissions') },
     ];
@@ -102,6 +103,38 @@ describe('buildDashboardSummary (§7 Portfolio overview)', () => {
     expect(summary.overallHealth).toBeNull();
     expect(summary.statusCounts).toEqual({ healthy: 0, atRisk: 0, critical: 0 });
     expect(summary.projects[0].reason).toBe('Insufficient permissions');
+    expect(summary.projects[0].reasonKind).toBe('failed');
+  });
+
+  it('treats a successful run with no computable score as insufficient data, not a failure (Tarea 6.2, §24)', () => {
+    const noScoreOutcome: ProjectAnalysisOutcome = {
+      ok: true,
+      projectKey: 'PAY',
+      date: '2026-08-15',
+      healthScore: null,
+      status: null,
+      dimensions: {
+        schedule: EMPTY_DIMENSION,
+        delivery: EMPTY_DIMENSION,
+        scope: EMPTY_DIMENSION,
+        capacity: EMPTY_DIMENSION,
+        dependencies: EMPTY_DIMENSION,
+      },
+      totalIssues: 0,
+      recommendations: [],
+    };
+    const entries: DashboardEntry[] = [
+      { project: project('PAY', 'Payments Platform'), outcome: noScoreOutcome },
+    ];
+
+    const summary = buildDashboardSummary(entries);
+
+    const payRow = summary.projects[0];
+    expect(payRow.healthScore).toBeNull();
+    expect(payRow.status).toBeNull();
+    expect(payRow.reason).toBe('N/A — Insufficient data');
+    expect(payRow.reasonKind).toBe('insufficient-data');
+    expect(summary.overallHealth).toBeNull();
   });
 
   it('uses the resolver-precomputed trend (Tarea 5.3) instead of the placeholder when provided', () => {

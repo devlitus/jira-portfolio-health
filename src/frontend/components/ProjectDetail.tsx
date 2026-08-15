@@ -49,7 +49,8 @@ const DimensionRow: React.FC<{ dimension: DimensionDetail }> = ({ dimension }) =
 );
 
 export const ProjectDetail: React.FC<ProjectDetailProps> = ({ detail, onBack }) => {
-  const { projectName, healthScore, status, trend, dimensions, factors, recommendations, reason } = detail;
+  const { projectName, healthScore, status, trend, dimensions, factors, recommendations, reason, reasonKind } =
+    detail;
 
   return (
     <section>
@@ -69,7 +70,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ detail, onBack }) 
       </p>
 
       {reason ? (
-        <p>{reason}</p>
+        <p>{reasonKind === 'failed' ? `Analysis unavailable — ${reason}` : reason}</p>
       ) : (
         <>
           <section>
@@ -89,7 +90,11 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ detail, onBack }) 
           <section>
             <h2>Why?</h2>
             {factors.length === 0 ? (
-              <p>No issues found — this project looks healthy.</p>
+              <p>
+                {healthScore === null
+                  ? 'N/A — Insufficient data to explain this yet.'
+                  : 'No issues found — this project looks healthy.'}
+              </p>
             ) : (
               <ol>
                 {factors.map((factor) => (
