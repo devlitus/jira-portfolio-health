@@ -280,12 +280,12 @@ Tarea grande — subtareas:
 
 Tarea grande — subtareas:
 
-- [ ] **4.3.a — Resolver `getProjectDetail(projectKey)`:** devuelve snapshot más reciente + dimensiones + factores + recomendaciones.
-- [ ] **4.3.b — Cabecera:** nombre, health con lozenge, línea de tendencia (placeholder hasta Fase 5).
-- [ ] **4.3.c — Sección DIMENSIONS:** las 5 dimensiones con su score y lozenge por color; si una dimensión es `null`, mostrar "N/A — Insufficient data" (§12, §24).
-- [ ] **4.3.d — Sección "Why?":** lista numerada de los factores ordenados por impacto, con sus mensajes explicativos (§16).
-- [ ] **4.3.e — Sección "Recommended actions":** top 3 recomendaciones del Recommendation Engine.
-- **DoD:** navegación dashboard → detalle → volver, cumpliendo la regla de oro §36: el usuario ve qué pasa, por qué y qué revisar.
+- [x] **4.3.a — Resolver `getProjectDetail(projectKey)`:** devuelve snapshot más reciente + dimensiones + factores + recomendaciones. → `src/index.ts`, resolver `getProjectDetail`; reutiliza `loadDashboardEntries()` (mismo KVS `latest:*` que 4.1/4.2, sin recomputar) y reduce con la función pura `buildProjectDetail` (`src/health/projectDetail.ts`); un `projectKey` sin entrada cae al mismo patrón "no analysis yet" que `buildDashboardSummary`.
+- [x] **4.3.b — Cabecera:** nombre, health con lozenge, línea de tendencia (placeholder hasta Fase 5). → `src/frontend/components/ProjectDetail.tsx` (Custom UI, no UI Kit — ver Tarea 1.5.c/`CLAUDE.md`): `<h1>` + health con badge de color (mismo patrón `StatusBadge` que `Dashboard.tsx`) y sección "Trend" con el placeholder `'—'` de `buildProjectDetail`.
+- [x] **4.3.c — Sección DIMENSIONS:** las 5 dimensiones con su score y lozenge por color; si una dimensión es `null`, mostrar "N/A — Insufficient data" (§12, §24). → `buildProjectDetail()` mapea las 5 dimensiones y deriva su `status` reutilizando `getStatus()` (Tarea 3.3) sobre el score de cada dimensión; `ProjectDetail.tsx` renderiza "N/A — Insufficient data" cuando `score`/`status` son `null`.
+- [x] **4.3.d — Sección "Why?":** lista numerada de los factores ordenados por impacto, con sus mensajes explicativos (§16). → `buildProjectDetail()` concatena los factores de las 5 dimensiones y los ordena ascendente por `impact` (mayor penalización primero); `ProjectDetail.tsx` los renderiza como `<ol>`.
+- [x] **4.3.e — Sección "Recommended actions":** top 3 recomendaciones del Recommendation Engine. → `buildProjectDetail()` pasa `outcome.recommendations` (ya generadas y acotadas a 3 por `generateRecommendations`, Tarea 3.4) sin recalcular.
+- **DoD:** navegación dashboard → detalle → volver, cumpliendo la regla de oro §36: el usuario ve qué pasa, por qué y qué revisar. → `src/frontend/index.tsx`: nuevo estado `detail` + `selectProject(projectKey)` (`invoke('getProjectDetail', ...)`), cableado como `onSelectProject` en `AttentionQueue` (ya preparado en Tarea 4.2) y en las filas de `Dashboard` (nuevo prop `onSelectProject`); botón "← Back to dashboard" vuelve a `ready`. `npm test` (122/122, incl. `__tests__/projectDetail.test.ts` con 7 tests), `npm run lint`, `tsc --noEmit` y `forge lint` en verde; `npm run build` genera `static/main/bundle.js`; `forge deploy --non-interactive -e development` OK (v5.4.0, sin cambios de scopes → no requiere reinstalar). Confirmación visual de la navegación completa en el sitio de desarrollo queda pendiente de que el usuario la haga o la pida explícitamente (igual que en las Tareas 0.1/1.5.d/3.5/4.1).
 
 ### Tarea 4.4 — Navegación entre pantallas
 

@@ -7,6 +7,8 @@ import type { HealthStatus } from '../../metrics/model';
 
 interface DashboardProps {
   summary: DashboardSummary;
+  /** Wired up to the Project Detail screen (Tarea 4.3/4.4). */
+  onSelectProject?: (projectKey: string) => void;
 }
 
 const STATUS_LABELS: Record<HealthStatus, string> = {
@@ -37,16 +39,27 @@ const TopAttentionItem: React.FC<{ project: DashboardProjectRow }> = ({ project 
   </li>
 );
 
-const ProjectRow: React.FC<{ project: DashboardProjectRow }> = ({ project }) => (
+const ProjectRow: React.FC<{
+  project: DashboardProjectRow;
+  onSelectProject?: (projectKey: string) => void;
+}> = ({ project, onSelectProject }) => (
   <tr>
-    <td>{project.projectName}</td>
+    <td>
+      {onSelectProject ? (
+        <button type="button" onClick={() => onSelectProject(project.projectKey)}>
+          {project.projectName}
+        </button>
+      ) : (
+        project.projectName
+      )}
+    </td>
     <td>{project.healthScore ?? 'N/A'}</td>
     <td>{project.trend}</td>
     <td>{project.status ? <StatusBadge status={project.status} /> : project.reason ?? 'N/A'}</td>
   </tr>
 );
 
-export const Dashboard: React.FC<DashboardProps> = ({ summary }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ summary, onSelectProject }) => {
   const { overallHealth, statusCounts, projects, topAttention } = summary;
 
   return (
@@ -87,7 +100,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ summary }) => {
           </thead>
           <tbody>
             {projects.map((project) => (
-              <ProjectRow key={project.projectKey} project={project} />
+              <ProjectRow key={project.projectKey} project={project} onSelectProject={onSelectProject} />
             ))}
           </tbody>
         </table>

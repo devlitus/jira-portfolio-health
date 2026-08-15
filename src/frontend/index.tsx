@@ -4,9 +4,11 @@ import { invoke } from '@forge/bridge';
 import { ProjectSelector } from './components/ProjectSelector';
 import { Dashboard } from './components/Dashboard';
 import { AttentionQueue } from './components/AttentionQueue';
+import { ProjectDetail } from './components/ProjectDetail';
 import type { Project } from '../metrics/model';
 import type { DashboardSummary } from '../health/dashboard';
 import type { AttentionQueueEntry } from '../health/attentionQueue';
+import type { ProjectDetail as ProjectDetailData } from '../health/projectDetail';
 
 // Custom UI app (see AGENTS.md's "UI approach: Custom UI" override): a plain
 // React tree bundled to static files and served by Forge, talking to the
@@ -28,7 +30,7 @@ const ANALYSIS_STEPS = [
   'Saving baseline',
 ];
 
-type Status = 'loading' | 'setup' | 'analyzing' | 'ready' | 'error';
+type Status = 'loading' | 'setup' | 'analyzing' | 'ready' | 'detail' | 'error';
 
 const App: React.FC = () => {
   const [status, setStatus] = useState<Status>('loading');
@@ -36,6 +38,7 @@ const App: React.FC = () => {
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [dashboard, setDashboard] = useState<DashboardSummary | null>(null);
   const [attentionQueue, setAttentionQueue] = useState<AttentionQueueEntry[]>([]);
+  const [projectDetail, setProjectDetail] = useState<ProjectDetailData | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -110,6 +113,17 @@ const App: React.FC = () => {
     }
   }
 
+  async function selectProject(projectKey: string) {
+    try {
+      const detail = (await invoke('getProjectDetail', { projectKey })) as ProjectDetailData;
+      setProjectDetail(detail);
+      setStatus('detail');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load project detail.');
+      setStatus('error');
+    }
+  }
+
   if (status === 'loading') {
     return <p>Loading...</p>;
   }
@@ -131,11 +145,15 @@ const App: React.FC = () => {
     );
   }
 
+  if (status === 'detail' && projectDetail) {
+    return <ProjectDetail detail={projectDetail} onBack={() => setStatus('ready')} />;
+  }
+
   if (status === 'ready' && dashboard) {
     return (
       <>
-        <AttentionQueue entries={attentionQueue} />
-        <Dashboard summary={dashboard} />
+        <AttentionQueue entries={attentionQueue} onSelectProject={selectProject} />
+        <Dashboard summary={dashboard} onSelectProject={selectProject} />
         <button type="button" onClick={() => setStatus('setup')}>
           Edit selection
         </button>

@@ -7,7 +7,7 @@ import type { HealthStatus } from '../../metrics/model';
 
 interface AttentionQueueProps {
   entries: AttentionQueueEntry[];
-  /** Wired up once the Project Detail screen exists (Tarea 4.3/4.4). */
+  /** Opens the Project Detail screen (Tarea 4.3) for this project. */
   onSelectProject?: (projectKey: string) => void;
 }
 

@@ -15,6 +15,8 @@ import { buildDashboardSummary } from './health/dashboard';
 import type { DashboardEntry, DashboardSummary } from './health/dashboard';
 import { buildAttentionQueue } from './health/attentionQueue';
 import type { AttentionQueueEntry } from './health/attentionQueue';
+import { buildProjectDetail } from './health/projectDetail';
+import type { ProjectDetail } from './health/projectDetail';
 
 const resolver = new Resolver();
 
@@ -90,6 +92,23 @@ resolver.define('getDashboard', async (): Promise<DashboardSummary> => {
  */
 resolver.define('getAttentionQueue', async (): Promise<AttentionQueueEntry[]> => {
   return buildAttentionQueue(await loadDashboardEntries());
+});
+
+/**
+ * Project Detail (Tarea 4.3, §16): the selected project's latest cached
+ * analysis, reduced to the detail screen's dimensions/factors/recommendations.
+ * A `projectKey` outside the current selection (e.g. stale UI state) falls
+ * back to the same "no analysis" shape `buildProjectDetail` already returns
+ * for a project that was selected but never analyzed.
+ */
+resolver.define('getProjectDetail', async (request): Promise<ProjectDetail> => {
+  const { projectKey } = request.payload as { projectKey: string };
+  const entries = await loadDashboardEntries();
+  const entry = entries.find(({ project }) => project.key === projectKey);
+
+  return buildProjectDetail(
+    entry ?? { project: { id: projectKey, key: projectKey, name: projectKey }, outcome: undefined }
+  );
 });
 
 export const handler = resolver.getDefinitions();
