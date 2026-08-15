@@ -4,6 +4,19 @@
     "commit-commands@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true
   },
+  "allowedChannelPlugins": [
+    {
+      "marketplace": "claude-plugins-official",
+      "plugin": "playwright@claude-plugins-official"
+    }
+  ],
+  "attribution": {
+    "commit": "Generated with devlitus",
+    "pr": "Generated with devlitus"
+  },
+  "plansDirectory": "docs/plans",
+  "autoMemoryDirectory": ".claude\\memory",
+  "autoMemoryEnabled": true,
   "companyAnnouncements": [
     "Welcome to Acme Corp! Review our code guidelines at docs.acme.com",
     "Reminder: Code reviews required for all PRs",
