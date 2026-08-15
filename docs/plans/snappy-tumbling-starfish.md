@@ -120,7 +120,7 @@ Sin referencia visual directa del mockup (`code.html` solo cubre Dashboard) — 
 
 ### Tarea F.2 — Estados vacíos/error inline en `index.tsx`
 
-- [ ] Re-estilizar `status==='loading'`, `status==='error'` y `status==='analyzing'` (lista de `ANALYSIS_STEPS`) con los mismos tokens, sin nuevos archivos compartidos (uso único).
+- [x] Re-estilizar `status==='loading'`, `status==='error'` y `status==='analyzing'` (lista de `ANALYSIS_STEPS`) con los mismos tokens, sin nuevos archivos compartidos (uso único).
 - **DoD:** `role="alert"` en el estado de error se conserva para accesibilidad.
 
 ---
