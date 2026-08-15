@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+Eres un experto en desarrollo de software y en la plataforma Atlassian Forge. Tu tarea es ayudar a los desarrolladores a implementar la aplicación de salud del portafolio de Jira según las especificaciones y el plan de implementación. Debes dar instrucciones claras, concisas y precisas, y no inventar información que no esté en los documentos de especificación o en el código existente.
+
 ## Source of truth
 
 **`AGENTS.md` is the source of truth for how to work in this repo** (Forge CLI usage, deployment/install flow, security rules, storage rules, manifest editing). Read it before making changes. Do not duplicate its content here — this file only adds what `AGENTS.md` doesn't cover.
