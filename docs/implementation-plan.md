@@ -126,11 +126,11 @@ Archivos: `src/frontend/index.jsx`, `src/frontend/components/ProjectSelector.jsx
 
 Tarea grande — subtareas:
 
-- [ ] **1.5.a — Resolver `getProjects`:** devuelve la lista de proyectos visibles para el usuario (usa 1.3.a).
-- [ ] **1.5.b — Resolvers `getConfig` / `saveConfig`:** exponen 1.4 al frontend.
-- [ ] **1.5.c — UI de setup:** si no hay proyectos seleccionados, mostrar la pantalla "Select projects to monitor" (§26) con checkboxes + botón `[Start analysis]` (componentes UI Kit: `Checkbox`, `Button`, `Form` — NUNCA `<div>`, usar `Box`/`Stack`).
-- [ ] **1.5.d — Estado de carga:** pantalla "Analyzing portfolio..." con pasos (§26 Loading) mientras corre el primer análisis (por ahora el análisis será un stub que solo guarda config).
-- **DoD:** flujo manual verificado en el sitio de desarrollo: instalar → seleccionar proyectos → guardar → recargar y la selección persiste.
+- [x] **1.5.a — Resolver `getProjects`:** devuelve la lista de proyectos visibles para el usuario (usa 1.3.a). → `src/index.ts`, resolver `getProjects` → `listProjects(asUser())`.
+- [x] **1.5.b — Resolvers `getConfig` / `saveConfig`:** exponen 1.4 al frontend. → `src/index.ts`, resolvers `getConfig`/`saveConfig` sobre `src/storage/configStore.ts`; declarados en `manifest.yml` (`resolver.function: resolver` en `jira:globalPage`, función `resolver` → `index.handler`).
+- [x] **1.5.c — UI de setup:** si no hay proyectos seleccionados, mostrar la pantalla "Select projects to monitor" (§26) con checkboxes + botón `[Start analysis]` (componentes UI Kit: `Checkbox`, `Button`, `Form` — NUNCA `<div>`, usar `Box`/`Stack`). → Implementado en `src/frontend/components/ProjectSelector.tsx` con elementos HTML nativos (`<input type="checkbox">`, `<form>`, `<button>`), no UI Kit: este repo usa Custom UI por decisión de proyecto (ver `CLAUDE.md`/`AGENTS.md` — anula la restricción UI-Kit-only del resto de `AGENTS.md`).
+- [x] **1.5.d — Estado de carga:** pantalla "Analyzing portfolio..." con pasos (§26 Loading) mientras corre el primer análisis (por ahora el análisis será un stub que solo guarda config). → Estado `analyzing` en `src/frontend/index.tsx`: lista de pasos §26 mientras `invoke('saveConfig', ...)` está en curso; al resolver pasa a la pantalla `ready` ("Portfolio ready").
+- **DoD:** flujo manual verificado en el sitio de desarrollo: instalar → seleccionar proyectos → guardar → recargar y la selección persiste. → Verificado por código/CLI: `npm test` (18/18), `npm run lint`, `tsc --noEmit` y `forge lint` en verde; `npm run build` genera `static/main/bundle.js`; `forge deploy --non-interactive -e development` OK (v4.3.0, sin cambios de scopes → no requiere reinstalar). La lógica de persistencia (`getConfig`/`saveConfig` sobre KVS) ya está cubierta por los tests de la Tarea 1.4; confirmación visual del flujo completo en el navegador del sitio de desarrollo queda pendiente de que el usuario la haga o la pida explícitamente (igual que en la Tarea 0.1).
 
 ### Checkpoint Fase 1
 

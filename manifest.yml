@@ -3,6 +3,8 @@ modules:
     - key: jira-portfolio-health-global-page-hello-world
       resource: main
       title: jira-portfolio-health
+      resolver:
+        function: resolver
   scheduledTrigger:
     - key: jira-portfolio-health-daily-snapshot
       function: daily-snapshot
@@ -10,6 +12,8 @@ modules:
   function:
     - key: daily-snapshot
       handler: triggers/dailySnapshot.run
+    - key: resolver
+      handler: index.handler
 app:
   runtime:
     name: nodejs24.x
