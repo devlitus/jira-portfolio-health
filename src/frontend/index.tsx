@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { invoke } from '@forge/bridge';
+import { AppShell, type AppShellView } from './components/AppShell';
 import { ProjectSelector } from './components/ProjectSelector';
 import { Dashboard } from './components/Dashboard';
 import { AttentionQueue } from './components/AttentionQueue';
@@ -143,55 +144,75 @@ const App: React.FC = () => {
     }
   }
 
+  function renderContent() {
+    if (status === 'error') {
+      return <p role="alert">{error}</p>;
+    }
+
+    if (status === 'analyzing') {
+      return (
+        <section>
+          <h1>Analyzing portfolio...</h1>
+          <ul style={{ listStyle: 'none', padding: 0 }}>
+            {ANALYSIS_STEPS.map((step) => (
+              <li key={step}>{'✓'} {step}</li>
+            ))}
+          </ul>
+        </section>
+      );
+    }
+
+    if (status === 'detail' && projectDetail) {
+      return <ProjectDetail detail={projectDetail} onBack={() => setStatus('ready')} />;
+    }
+
+    if (status === 'ready' && dashboard) {
+      return (
+        <>
+          <AttentionQueue entries={attentionQueue} onSelectProject={selectProject} />
+          <Dashboard
+            summary={dashboard}
+            onSelectProject={selectProject}
+            onRerunAnalysis={rerunAnalysis}
+            isRerunning={isRerunning}
+          />
+        </>
+      );
+    }
+
+    return (
+      <ProjectSelector
+        projects={projects}
+        selectedKeys={selectedKeys}
+        onToggle={toggleProject}
+        onStartAnalysis={startAnalysis}
+      />
+    );
+  }
+
   if (status === 'loading') {
     return <p>Loading...</p>;
   }
 
-  if (status === 'error') {
-    return <p role="alert">{error}</p>;
-  }
-
-  if (status === 'analyzing') {
-    return (
-      <section>
-        <h1>Analyzing portfolio...</h1>
-        <ul style={{ listStyle: 'none', padding: 0 }}>
-          {ANALYSIS_STEPS.map((step) => (
-            <li key={step}>{'✓'} {step}</li>
-          ))}
-        </ul>
-      </section>
-    );
-  }
-
-  if (status === 'detail' && projectDetail) {
-    return <ProjectDetail detail={projectDetail} onBack={() => setStatus('ready')} />;
-  }
-
-  if (status === 'ready' && dashboard) {
-    return (
-      <>
-        <AttentionQueue entries={attentionQueue} onSelectProject={selectProject} />
-        <Dashboard
-          summary={dashboard}
-          onSelectProject={selectProject}
-          onRerunAnalysis={rerunAnalysis}
-          isRerunning={isRerunning}
-        />
-        <button type="button" onClick={() => setStatus('setup')}>
-          Edit selection
-        </button>
-      </>
-    );
-  }
+  // Adaptación 4: "Dashboard" solo navega si ya hay un análisis (`dashboard`
+  // existe); "Configuration" reusa la lógica del antiguo botón "Edit
+  // selection" (setStatus('setup') sin condiciones).
+  const appShellView: AppShellView =
+    status === 'detail' ? 'detail' : status === 'setup' ? 'configuration' : 'dashboard';
 
   return (
-    <ProjectSelector
-      projects={projects}
-      selectedKeys={selectedKeys}
-      onToggle={toggleProject}
-      onStartAnalysis={startAnalysis}
-    />
+    <AppShell
+      activeView={appShellView}
+      onNavigateDashboard={() => {
+        if (dashboard) {
+          setStatus('ready');
+        }
+      }}
+      onNavigateConfiguration={() => setStatus('setup')}
+      detailProjectName={status === 'detail' ? projectDetail?.projectName : undefined}
+    >
+      {renderContent()}
+    </AppShell>
   );
 };
 

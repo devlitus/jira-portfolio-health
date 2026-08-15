@@ -59,8 +59,8 @@ Objetivo: envolver la app en el sidebar/topbar del sistema de diseño, mapeado a
 
 ### Tarea B.2 — Integrar `AppShell` en `index.tsx`
 
-- [ ] Envolver el contenido de los estados `setup/analyzing/ready/detail/error` en `<AppShell>`; dejar `loading` fuera (spinner centrado sin chrome).
-- [ ] Conectar "Dashboard" → `setStatus('ready')` (solo si `dashboard` ya existe) y "Configuration" → `setStatus('setup')`, reusando la lógica que hoy dispara el botón "Edit selection".
+- [x] Envolver el contenido de los estados `setup/analyzing/ready/detail/error` en `<AppShell>`; dejar `loading` fuera (spinner centrado sin chrome).
+- [x] Conectar "Dashboard" → `setStatus('ready')` (solo si `dashboard` ya existe) y "Configuration" → `setStatus('setup')`, reusando la lógica que hoy dispara el botón "Edit selection".
 - **DoD:** navegar por los 5 estados no rompe el flujo existente (`invoke` calls intactas); `npm run lint` pasa.
 
 ---
