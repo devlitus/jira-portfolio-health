@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { invoke } from '@forge/bridge';
 import { ProjectSelector } from './components/ProjectSelector';
 import type { Project } from '../metrics/model';
+import type { ProjectAnalysisOutcome } from '../health/analyzeProject';
 
 // Custom UI app (see AGENTS.md's "UI approach: Custom UI" override): a plain
 // React tree bundled to static files and served by Forge, talking to the
@@ -12,9 +13,10 @@ interface PortfolioConfig {
   selectedProjectKeys: string[];
 }
 
-// §26 "Loading" screen steps. The first analysis is a stub for now (Tarea
-// 1.5.d) — it only persists the project selection — so the list is shown as
-// already complete while the save is in flight rather than animated.
+// §26 "Loading" screen steps. The real pipeline (Tarea 3.5) now runs behind
+// this screen, but its steps aren't individually observable from the
+// frontend, so the list is shown as already complete while `runAnalysis` is
+// in flight rather than animated.
 const ANALYSIS_STEPS = [
   'Loading projects',
   'Reading issues',
@@ -29,6 +31,7 @@ const App: React.FC = () => {
   const [status, setStatus] = useState<Status>('loading');
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [analysisResults, setAnalysisResults] = useState<ProjectAnalysisOutcome[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -77,9 +80,11 @@ const App: React.FC = () => {
         selectedProjectKeys: Array.from(selectedKeys),
       })) as PortfolioConfig;
       setSelectedKeys(new Set(config.selectedProjectKeys));
+      const results = (await invoke('runAnalysis')) as ProjectAnalysisOutcome[];
+      setAnalysisResults(results);
       setStatus('ready');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save the project selection.');
+      setError(err instanceof Error ? err.message : 'Failed to analyze the portfolio.');
       setStatus('error');
     }
   }
@@ -111,9 +116,16 @@ const App: React.FC = () => {
       <section>
         <h1>Portfolio ready</h1>
         <ul>
-          {monitoredProjects.map((project) => (
-            <li key={project.key}>{project.name}</li>
-          ))}
+          {monitoredProjects.map((project) => {
+            const result = analysisResults.find((r) => r.projectKey === project.key);
+            return (
+              <li key={project.key}>
+                {project.name}
+                {result?.ok && ` — Health ${result.healthScore ?? 'N/A'} (${result.status ?? 'N/A'})`}
+                {result && !result.ok && ` — Analysis unavailable: ${result.reason}`}
+              </li>
+            );
+          })}
         </ul>
         <button type="button" onClick={() => setStatus('setup')}>
           Edit selection

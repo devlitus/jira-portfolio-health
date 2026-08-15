@@ -243,9 +243,9 @@ Archivo: `src/health/recommendations.js`
 
 Archivo: `src/health/analyzeProject.js`
 
-- [ ] `analyzeProject(projectKey)`: client Jira → normalizer → metrics → dimension scores → health score → recommendations → objeto resultado completo (listo para persistir como snapshot en Fase 5 y para servir al dashboard).
-- [ ] Resolver `runAnalysis` en `src/index.js` que ejecuta el análisis para todos los proyectos seleccionados y guarda el resultado más reciente en KVS (`latest:<projectKey>`) para que el dashboard no recalcule en cada carga (§24 Performance).
-- **DoD:** el botón "Start analysis" de la Fase 1 ejecuta el pipeline completo real; resultado cacheado en KVS.
+- [x] `analyzeProject(projectKey)`: client Jira → normalizer → metrics → dimension scores → health score → recommendations → objeto resultado completo (listo para persistir como snapshot en Fase 5 y para servir al dashboard). → `src/health/analyzeProject.ts`; recibe `(api, projectKey, { storyPointsFieldId?, thresholds?, now? })` (sigue el patrón `JiraFetchApi` de `jira/client.ts`); nunca lanza — un fallo de `getProjectIssues` se propaga como `{ ok: false, projectKey, reason }` (mismo patrón `ok/reason` que Tarea 1.3.c) en vez de tumbar el análisis de los demás proyectos.
+- [x] Resolver `runAnalysis` en `src/index.js` que ejecuta el análisis para todos los proyectos seleccionados y guarda el resultado más reciente en KVS (`latest:<projectKey>`) para que el dashboard no recalcule en cada carga (§24 Performance). → `src/index.ts`, resolver `runAnalysis`: lee `getConfig()`, ejecuta `analyzeProject` para cada `selectedProjectKeys` en paralelo (`Promise.all`) y persiste cada resultado exitoso en `kvs.set('latest:<projectKey>', result)`; los resultados fallidos se devuelven igualmente al frontend sin cachearse.
+- **DoD:** el botón "Start analysis" de la Fase 1 ejecuta el pipeline completo real; resultado cacheado en KVS. → `src/frontend/index.tsx`: `startAnalysis()` encadena `saveConfig` → `invoke('runAnalysis')` y muestra health/status (o el motivo del fallo) por proyecto en la pantalla "Portfolio ready". `npm test` (103/103), `npm run lint`, `tsc --noEmit` y `forge lint` en verde; `npm run build` genera `static/main/bundle.js`; `forge deploy --non-interactive -e development` OK (v5.1.0, sin cambios de scopes → no requiere reinstalar). Confirmación visual del flujo completo en el navegador del sitio de desarrollo queda pendiente de que el usuario la haga o la pida explícitamente (igual que en las Tareas 0.1/1.5.d).
 
 ### Checkpoint Fase 3
 
