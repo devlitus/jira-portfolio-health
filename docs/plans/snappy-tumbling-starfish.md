@@ -89,7 +89,7 @@ Objetivo: envolver la app en el sidebar/topbar del sistema de diseño, mapeado a
 
 ### Tarea D.1 — Tarjetas con borde-acento por severidad
 
-- [ ] Re-estilizar `AttentionQueueCard` como tarjeta con borde izquierdo de 4px por `status` (rojo/ámbar), `TrendBadge`, línea "Main issue" con icono `info`.
+- [x] Re-estilizar `AttentionQueueCard` como tarjeta con borde izquierdo de 4px por `status` (rojo/ámbar), `TrendBadge`, línea "Main issue" con icono `info`.
 - **DoD:** el estado vacío ("Nothing needs attention") y `onSelectProject` se conservan.
 
 ---
