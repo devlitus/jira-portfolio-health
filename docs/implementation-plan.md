@@ -206,10 +206,10 @@ Archivos: `src/health/score.js`, `src/health/dimensions.js`, `src/health/factors
 
 ### Tarea 3.1 — Fórmula del Health Score (§8, §23)
 
-- [ ] Implementar `calculateHealthScore(scores)` con la fórmula alternativa recomendada: Schedule 30%, Delivery 25%, Scope 15%, Capacity 15%, Dependencies 15%.
-- [ ] Manejo de dimensiones `null`: redistribuir el peso proporcionalmente entre las dimensiones disponibles (§24 — no penalizar por falta de datos). Documentar la regla.
-- [ ] `Math.round` y clamp a [0, 100].
-- **DoD:** tests unitarios incluido el caso §30 "Healthy project" (esperado ≥ 90).
+- [x] Implementar `calculateHealthScore(scores)` con la fórmula alternativa recomendada: Schedule 30%, Delivery 25%, Scope 15%, Capacity 15%, Dependencies 15%. → `src/health/score.ts`, `calculateHealthScore()`.
+- [x] Manejo de dimensiones `null`: redistribuir el peso proporcionalmente entre las dimensiones disponibles (§24 — no penalizar por falta de datos). Documentar la regla. → Peso de cada dimensión disponible = `peso original / suma de pesos disponibles`; `null` solo si las 5 dimensiones son `null` (documentado en el JSDoc de la función).
+- [x] `Math.round` y clamp a [0, 100]. → `Math.min(100, Math.max(0, Math.round(weightedSum)))`.
+- **DoD:** tests unitarios incluido el caso §30 "Healthy project" (esperado ≥ 90). → `__tests__/healthScore.test.ts` (7 tests, incluye "Healthy project" ≥ 90, redistribución de peso, caso todo `null`, clamp/redondeo); `npm test` (62/62), `npm run lint`, `tsc --noEmit` y `forge lint` en verde.
 
 ### Tarea 3.2 — Dimension scores con factores (§9–§13, §15)
 
