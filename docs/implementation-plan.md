@@ -179,10 +179,10 @@ Tarea grande — subtareas:
 
 ### Tarea 2.5 — Métricas de Dependencies (§13)
 
-- [ ] `blockedCount`: issues con link entrante "is blocked by" cuyo bloqueante no está Done.
-- [ ] `blockedAge`: días desde que se creó el link de bloqueo (o proxy: desde última actualización si el changelog no lo da — documentar la aproximación).
-- [ ] `dependentProjectCount`: nº de proyectos distintos de los bloqueantes (dependencias cross-project).
-- **DoD:** tests: sin bloqueos, bloqueos recientes, bloqueos > 5 días, dependencias externas al proyecto.
+- [x] `blockedCount`: issues con link entrante "is blocked by" cuyo bloqueante no está Done. → `src/metrics/dependencies.ts`, `computeDependenciesMetrics()`; un link con `relatedStatusCategory: null` (estado del bloqueante desconocido) no cuenta como bloqueo activo (§24 — no inventar datos).
+- [x] `blockedAge`: días desde que se creó el link de bloqueo (o proxy: desde última actualización si el changelog no lo da — documentar la aproximación). → Jira no expone el timestamp de creación del link (documentado ya en `IssueLink`, Tarea 1.2); proxy = días desde la última transición registrada en `history` del issue bloqueado, con fallback a `created` si no hay historial (mismo patrón que `inProgressAgeDays` en `delivery.ts`). Expuesto como `averageBlockedAgeDays` + `agedBlockedCount` (> 5 días, umbral documentado en el código).
+- [x] `dependentProjectCount`: nº de proyectos distintos de los bloqueantes (dependencias cross-project). → `dependentProjectCount`/`dependentProjectKeys`: proyectos distintos del propio (`projectKey`) entre los bloqueantes activos.
+- **DoD:** tests: sin bloqueos, bloqueos recientes, bloqueos > 5 días, dependencias externas al proyecto. → `__tests__/dependenciesMetrics.test.ts` (7 tests); `npm test` (53/53), `npm run lint`, `tsc --noEmit` y `forge lint` en verde.
 
 ### Tarea 2.6 — Orquestador de métricas
 
