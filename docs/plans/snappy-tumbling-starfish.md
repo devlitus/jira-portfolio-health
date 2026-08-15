@@ -69,7 +69,7 @@ Objetivo: envolver la app en el sidebar/topbar del sistema de diseño, mapeado a
 
 ### Tarea C.1 — Hero de salud + desglose de estados
 
-- [ ] Card `lg:col-span-8`: score `display-hero` + `/100`, subtítulo con copy real (Adaptación 9), barras Critical/At Risk/Healthy con `statusCounts` real.
+- [x] Card `lg:col-span-8`: score `display-hero` + `/100`, subtítulo con copy real (Adaptación 9), barras Critical/At Risk/Healthy con `statusCounts` real.
 - **DoD:** los 3 conteos y el `overallHealth` mostrados coinciden con `summary` sin datos hardcodeados.
 
 ### Tarea C.2 — Tabla "Health by Project"
