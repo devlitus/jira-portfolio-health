@@ -54,7 +54,7 @@ Objetivo: envolver la app en el sidebar/topbar del sistema de diseño, mapeado a
 
 ### Tarea B.1 — `AppShell.tsx`
 
-- [ ] Crear `src/frontend/components/AppShell.tsx`: sidebar fijo desktop (branding, nav "Dashboard"/"Configuration", breadcrumb de proyecto en `detail`) + topbar delgada mobile (solo branding, sin drawer).
+- [x] Crear `src/frontend/components/AppShell.tsx`: sidebar fijo desktop (branding, nav "Dashboard"/"Configuration", breadcrumb de proyecto en `detail`) + topbar delgada mobile (solo branding, sin drawer).
 - **DoD:** `AppShell` es puro en props (`activeView`, `onNavigateDashboard`, `onNavigateConfiguration`, `detailProjectName?`) — no conoce el estado interno de `index.tsx`.
 
 ### Tarea B.2 — Integrar `AppShell` en `index.tsx`
