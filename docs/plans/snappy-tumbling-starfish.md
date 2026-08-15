@@ -37,7 +37,7 @@ Objetivo: dejar la base de diseño (colores, tipografía, iconos, badges reutili
 
 ### Tarea A.2 — Set de iconos SVG inline
 
-- [ ] Crear `src/frontend/components/ui/icons.tsx` con 10-12 iconos como componentes React (`currentColor`, tamaño vía prop): dashboard, chart/analytics, settings, warning, info, refresh, arrow-up, arrow-down, arrow-forward, filter, more-vert, notifications.
+- [x] Crear `src/frontend/components/ui/icons.tsx` con 10-12 iconos como componentes React (`currentColor`, tamaño vía prop): dashboard, chart/analytics, settings, warning, info, refresh, arrow-up, arrow-down, arrow-forward, filter, more-vert, notifications.
 - **DoD:** cada icono renderiza sin dependencias externas ni `<link>`/`fetch` a CDN.
 
 ### Tarea A.3 — Consolidar `StatusBadge` y `TrendBadge`
