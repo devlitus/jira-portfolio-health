@@ -40,6 +40,7 @@ const App: React.FC = () => {
   const [attentionQueue, setAttentionQueue] = useState<AttentionQueueEntry[]>([]);
   const [projectDetail, setProjectDetail] = useState<ProjectDetailData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isRerunning, setIsRerunning] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -113,6 +114,24 @@ const App: React.FC = () => {
     }
   }
 
+  async function rerunAnalysis() {
+    setIsRerunning(true);
+    try {
+      await invoke('runAnalysis');
+      const [summary, queue] = await Promise.all([
+        invoke('getDashboard') as Promise<DashboardSummary>,
+        invoke('getAttentionQueue') as Promise<AttentionQueueEntry[]>,
+      ]);
+      setDashboard(summary);
+      setAttentionQueue(queue);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to re-run the analysis.');
+      setStatus('error');
+    } finally {
+      setIsRerunning(false);
+    }
+  }
+
   async function selectProject(projectKey: string) {
     try {
       const detail = (await invoke('getProjectDetail', { projectKey })) as ProjectDetailData;
@@ -153,7 +172,12 @@ const App: React.FC = () => {
     return (
       <>
         <AttentionQueue entries={attentionQueue} onSelectProject={selectProject} />
-        <Dashboard summary={dashboard} onSelectProject={selectProject} />
+        <Dashboard
+          summary={dashboard}
+          onSelectProject={selectProject}
+          onRerunAnalysis={rerunAnalysis}
+          isRerunning={isRerunning}
+        />
         <button type="button" onClick={() => setStatus('setup')}>
           Edit selection
         </button>

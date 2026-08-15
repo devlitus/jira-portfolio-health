@@ -9,6 +9,9 @@ interface DashboardProps {
   summary: DashboardSummary;
   /** Wired up to the Project Detail screen (Tarea 4.3/4.4). */
   onSelectProject?: (projectKey: string) => void;
+  /** Re-runs `runAnalysis` and refreshes this screen in place (Tarea 4.4). */
+  onRerunAnalysis?: () => void;
+  isRerunning?: boolean;
 }
 
 const STATUS_LABELS: Record<HealthStatus, string> = {
@@ -59,12 +62,23 @@ const ProjectRow: React.FC<{
   </tr>
 );
 
-export const Dashboard: React.FC<DashboardProps> = ({ summary, onSelectProject }) => {
+export const Dashboard: React.FC<DashboardProps> = ({
+  summary,
+  onSelectProject,
+  onRerunAnalysis,
+  isRerunning,
+}) => {
   const { overallHealth, statusCounts, projects, topAttention } = summary;
 
   return (
     <section>
       <h1>Portfolio Health</h1>
+
+      {onRerunAnalysis && (
+        <button type="button" onClick={onRerunAnalysis} disabled={isRerunning}>
+          {isRerunning ? 'Re-running analysis...' : 'Re-run analysis'}
+        </button>
+      )}
 
       <section>
         <h2>Overall Health</h2>

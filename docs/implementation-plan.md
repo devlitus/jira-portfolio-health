@@ -289,9 +289,9 @@ Tarea grande — subtareas:
 
 ### Tarea 4.4 — Navegación entre pantallas
 
-- [ ] Estado de vista en el frontend (setup / loading / dashboard / detalle) sin salir de la global page.
-- [ ] Botón "Re-run analysis" en el dashboard que dispara `runAnalysis` y refresca.
-- **DoD:** flujo completo §6 navegable sin recargar la página.
+- [x] Estado de vista en el frontend (setup / loading / dashboard / detalle) sin salir de la global page. → Ya cubierto por el estado `Status` (`'loading' | 'setup' | 'analyzing' | 'ready' | 'detail' | 'error'`) introducido en `src/frontend/index.tsx` a lo largo de las Tareas 1.5/3.5/4.1–4.3: todas las transiciones son `setStatus(...)` sobre el mismo árbol React montado una única vez (sin `window.location`/recargas); confirmado con `grep` sin resultados para `location.reload`/`location.href` en `src/frontend`.
+- [x] Botón "Re-run analysis" en el dashboard que dispara `runAnalysis` y refresca. → `src/frontend/components/Dashboard.tsx` (nuevas props `onRerunAnalysis`/`isRerunning`) + `src/frontend/index.tsx` (`rerunAnalysis()`): re-invoca `runAnalysis` y refresca `getDashboard`/`getAttentionQueue` sin salir de la pantalla `ready` (se queda en el dashboard mientras `isRerunning` deshabilita el botón); en caso de error cae al mismo patrón `status: 'error'` que el resto de acciones del frontend.
+- **DoD:** flujo completo §6 navegable sin recargar la página. → `npm test` (122/122), `npm run lint`, `tsc --noEmit` y `forge lint` en verde; `npm run build` genera `static/main/bundle.js`; `forge deploy --non-interactive -e development` OK (v5.5.0, sin cambios de scopes → no requiere reinstalar). Confirmación visual del flujo completo (setup → scan inicial → dashboard → re-run → detalle → volver) en el sitio de desarrollo queda pendiente de que el usuario la haga o la pida explícitamente (igual que en las Tareas 0.1/1.5.d/3.5/4.1/4.3).
 
 ### Checkpoint Fase 4
 
