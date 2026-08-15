@@ -157,11 +157,11 @@ Archivos: `src/metrics/schedule.js`, `src/metrics/delivery.js`, `src/metrics/sco
 
 Tarea grande — subtareas:
 
-- [ ] **2.2.a — Throughput semanal:** issues completados por semana (últimas 4–6 semanas), usando `resolutionDate`.
-- [ ] **2.2.b — Tendencia de throughput:** variación % entre la media de las 2 últimas semanas y las 2 anteriores.
-- [ ] **2.2.c — Reopened ratio:** issues con transición Done → no-Done en changelog / total de issues completados.
-- [ ] **2.2.d — Edad media de issues en progreso:** días desde transición a In Progress (changelog) hasta hoy.
-- **DoD:** tests por subtarea, incluyendo changelog vacío (cycle time no disponible → `null`).
+- [x] **2.2.a — Throughput semanal:** issues completados por semana (últimas 4–6 semanas), usando `resolutionDate`. → `src/metrics/delivery.ts`, `computeDeliveryMetrics()` (6 semanas por defecto, buckets oldest→newest).
+- [x] **2.2.b — Tendencia de throughput:** variación % entre la media de las 2 últimas semanas y las 2 anteriores. → `null` si hay menos de 4 semanas o si la media previa es 0 (evita `Infinity`).
+- [x] **2.2.c — Reopened ratio:** issues con transición Done → no-Done en changelog / total de issues completados. → Heurística por nombre de estado (`Done`/`Closed`/`Resolved`, case-insensitive) documentada en el código, ya que el changelog no expone `statusCategory` por entrada (mismo enfoque de aproximación que `blockedAge`, Tarea 1.2).
+- [x] **2.2.d — Edad media de issues en progreso:** días desde transición a In Progress (changelog) hasta hoy. → Proxy: días desde la última transición registrada en el historial (el normalizer no guarda el nombre del estado actual); `null` por issue si no tiene historial.
+- **DoD:** tests por subtarea, incluyendo changelog vacío (cycle time no disponible → `null`). → `__tests__/deliveryMetrics.test.ts` (12 tests); `npm test` (35/35), `npm run lint` y `tsc --noEmit` en verde.
 
 ### Tarea 2.3 — Métricas de Scope (§11)
 
