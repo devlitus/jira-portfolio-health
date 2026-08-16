@@ -6,6 +6,7 @@ import { ProjectSelector } from './components/ProjectSelector';
 import { Dashboard } from './components/Dashboard';
 import { AttentionQueue } from './components/AttentionQueue';
 import { ProjectDetail } from './components/ProjectDetail';
+import { RecommendedActions } from './components/RecommendedActions';
 import { AnalyticsIcon, WarningIcon } from './components/ui/icons';
 import type { Project } from '../metrics/model';
 import type { DashboardSummary } from '../health/dashboard';
@@ -260,43 +261,8 @@ const App: React.FC = () => {
         );
       }
 
-      // Placeholder hasta la Tarea D.3, que crea `RecommendedActions.tsx` con
-      // el diseño real (cards por severidad, iconos, botón "Mark reviewed"
-      // estilizado). Aquí solo se consumen `recommendedActions`/`toggleReviewed`
-      // (Tarea D.2) para dejarlos cableados de extremo a extremo.
       return (
-        <section className="rounded-xl border border-outline-variant bg-surface p-6 shadow-sm">
-          <h1 className="font-headline-lg text-headline-lg text-text-heading">Recommended Actions</h1>
-          <p className="mt-2 font-body-md text-body-md text-on-surface-variant">
-            {recommendedActions.length === 0
-              ? 'No recommendations right now — every monitored project looks healthy.'
-              : `${recommendedActions.length} recommendation${recommendedActions.length === 1 ? '' : 's'} across your monitored projects.`}
-          </p>
-          {recommendedActions.length > 0 && (
-            <ul className="mt-4 flex flex-col gap-2">
-              {recommendedActions.map((item) => {
-                const key = `${item.projectKey}:${item.code}`;
-                return (
-                  <li
-                    key={key}
-                    className="flex items-center justify-between gap-2 font-body-sm text-body-sm text-on-surface-variant"
-                  >
-                    <span>
-                      {item.projectName} — {item.message}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => toggleReviewed(item.projectKey, item.code)}
-                      className="font-label-bold text-label-bold text-primary transition-colors hover:text-primary-container"
-                    >
-                      {reviewedKeys.has(key) ? 'Reviewed' : 'Mark reviewed'}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </section>
+        <RecommendedActions items={recommendedActions} reviewedKeys={reviewedKeys} onToggleReviewed={toggleReviewed} />
       );
     }
 

@@ -118,8 +118,8 @@ Objetivo: nueva pantalla top-level que agrega recomendaciones de todos los proye
 
 ### Tarea D.3 — Componente `RecommendedActions.tsx`
 
-- [ ] Crear `src/frontend/components/RecommendedActions.tsx`: título + subtítulo ("Rule-based recommendations across your monitored projects, ordered by severity."), lista de cards con borde-acento izquierdo por `severity` (reusa `STATUS_BORDER_CLASS`-style ya visto en `AttentionQueue.tsx`), icono de severidad (warning para `CRITICAL`/`AT_RISK`, info para `HEALTHY`), `projectName` + `ruleLabel` (mono uppercase, `text-body-sm`) en la cabecera de la fila, mensaje de la recomendación debajo, botón "Mark reviewed" a la derecha que llama `onToggleReviewed` — filas ya revisadas quedan atenuadas (`opacity-60`) con el botón mostrando "Reviewed" (icono `CheckIcon`).
-- [ ] Estado vacío: "No recommendations right now — every monitored project looks healthy." cuando la lista agregada está vacía (0 proyectos con recomendaciones, caso legítimo dado el motor real de 4 reglas — Adaptación 2).
+- [x] Crear `src/frontend/components/RecommendedActions.tsx`: título + subtítulo ("Rule-based recommendations across your monitored projects, ordered by severity."), lista de cards con borde-acento izquierdo por `severity` (reusa `STATUS_BORDER_CLASS`-style ya visto en `AttentionQueue.tsx`), icono de severidad (warning para `CRITICAL`/`AT_RISK`, info para `HEALTHY`), `projectName` + `ruleLabel` (mono uppercase, `text-body-sm`) en la cabecera de la fila, mensaje de la recomendación debajo, botón "Mark reviewed" a la derecha que llama `onToggleReviewed` — filas ya revisadas quedan atenuadas (`opacity-60`) con el botón mostrando "Reviewed" (icono `CheckIcon`).
+- [x] Estado vacío: "No recommendations right now — every monitored project looks healthy." cuando la lista agregada está vacía (0 proyectos con recomendaciones, caso legítimo dado el motor real de 4 reglas — Adaptación 2).
 - **DoD:** cada card sigue el mismo lenguaje visual (`rounded-xl border border-outline-variant bg-surface shadow-sm`) que el resto de la app; el botón es accesible por teclado (`<button>` nativo, no `<div onClick>`).
 
 ---
