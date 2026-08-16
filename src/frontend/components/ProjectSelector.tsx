@@ -4,13 +4,14 @@
 // filas divididas, checkboxes nativos con accent-color de marca y botón
 // primario Atlassian-blue (`--color-primary-container`), siguiendo el mismo
 // lenguaje visual que Dashboard.tsx/AttentionQueue.tsx.
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import type { Project } from '../../metrics/model';
 
 interface ProjectSelectorProps {
   projects: Project[];
   selectedKeys: Set<string>;
   onToggle: (projectKey: string) => void;
+  onToggleAll: () => void;
   onStartAnalysis: () => void;
 }
 
@@ -18,8 +19,18 @@ export const ProjectSelector: React.FC<ProjectSelectorProps> = ({
   projects,
   selectedKeys,
   onToggle,
+  onToggleAll,
   onStartAnalysis,
 }) => {
+  const allSelected = projects.length > 0 && selectedKeys.size === projects.length;
+  const someSelected = selectedKeys.size > 0 && !allSelected;
+  const selectAllRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (selectAllRef.current) {
+      selectAllRef.current.indeterminate = someSelected;
+    }
+  }, [someSelected]);
   return (
     <section className="flex flex-col gap-gutter">
       <div>
@@ -48,8 +59,25 @@ export const ProjectSelector: React.FC<ProjectSelectorProps> = ({
           }}
         >
           <section className="overflow-hidden rounded-xl border border-outline-variant bg-surface shadow-sm">
-            <div className="border-b border-outline-variant bg-surface-slate p-4">
-              <h2 className="font-headline-sm text-headline-sm uppercase text-text-heading">Projects</h2>
+            <div className="flex items-center justify-between gap-3 border-b border-outline-variant bg-surface-slate p-4">
+              <label className="flex cursor-pointer items-center gap-3">
+                <input
+                  ref={selectAllRef}
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={onToggleAll}
+                  aria-label="Select all projects"
+                  className="h-5 w-5 shrink-0 rounded border-outline-variant accent-primary-container"
+                />
+                <h2 className="font-headline-sm text-headline-sm uppercase text-text-heading">Projects</h2>
+              </label>
+              <button
+                type="submit"
+                disabled={selectedKeys.size === 0}
+                className="rounded bg-primary-container px-6 py-2 font-label-bold text-label-bold text-on-primary transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Start analysis
+              </button>
             </div>
             <ul className="divide-y divide-outline-variant/50">
               {projects.map((project) => (

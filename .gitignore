@@ -78,3 +78,9 @@ Desktop.ini
 .playwright-mcp
 
 stitch_nvp_reference_dashboard/*
+
+# Local container service state (not needed in the repo)
+.container-service-assets/
+
+# Design mockup exports used as reference during UI refactors (not source)
+Dashboard UI mockups/

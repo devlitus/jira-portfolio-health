@@ -155,6 +155,12 @@ const App: React.FC = () => {
     });
   }
 
+  function toggleAllProjects() {
+    setSelectedKeys((current) =>
+      current.size === projects.length ? new Set() : new Set(projects.map((project) => project.key)),
+    );
+  }
+
   async function startAnalysis() {
     setStatus('analyzing');
     try {
@@ -293,6 +299,7 @@ const App: React.FC = () => {
         projects={projects}
         selectedKeys={selectedKeys}
         onToggle={toggleProject}
+        onToggleAll={toggleAllProjects}
         onStartAnalysis={startAnalysis}
       />
     );
