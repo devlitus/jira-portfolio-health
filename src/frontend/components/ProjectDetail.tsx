@@ -99,6 +99,21 @@ function formatImpact(impact: number): string {
   return `${impact > 0 ? '+' : '-'}${points} pt${points === 1 ? '' : 's'}`;
 }
 
+// Tarea E.4: títulos cortos para los 10 códigos de factor reales
+// (src/health/dimensions.ts) — mismo patrón que DIMENSION_LABELS.
+const FACTOR_TITLES: Record<string, string> = {
+  OVERDUE_ISSUES: 'Overdue issues',
+  STALLED_COMPLETION: 'Stalled completion',
+  THROUGHPUT_DECLINING: 'Throughput declining',
+  REOPENED_ISSUES: 'Reopened issues',
+  AGED_IN_PROGRESS_ISSUES: 'Aged in-progress issues',
+  SCOPE_GROWTH: 'Scope growth',
+  CAPACITY_OVERLOAD: 'Capacity overload',
+  BLOCKED_ISSUES: 'Blocked issues',
+  AGED_BLOCKERS: 'Aged blockers',
+  EXTERNAL_DEPENDENCIES: 'External dependencies',
+};
+
 // Grupo `relative` + `group`/`group-focus-within` (mismo patrón que la
 // tooltip de la barra Critical/At Risk/Healthy en Dashboard.tsx) para que el
 // tooltip funcione tanto con hover como con foco de teclado.
@@ -114,11 +129,18 @@ const ExplainerIcon: React.FC<{ label: string }> = ({ label }) => (
   </span>
 );
 
-const FactorRow: React.FC<{ factor: HealthFactor }> = ({ factor }) => (
-  <li className="group relative flex items-start gap-2 p-4">
-    <ExplainerIcon label={`Why: ${formatImpact(factor.impact)} on the health score`} />
-    <span className="font-body-md text-body-md text-on-surface-variant">{factor.message}</span>
-    <ExplainerTooltip>{formatImpact(factor.impact)} on the health score.</ExplainerTooltip>
+// Tarea E.4: tarjeta numerada (posición 1-indexada en la lista, ya ordenada
+// por impacto en el backend) en vez del icono `info` + tooltip anterior — el
+// mensaje pasa a estar siempre visible.
+const FactorRow: React.FC<{ factor: HealthFactor; index: number }> = ({ factor, index }) => (
+  <li className="flex items-start gap-3 p-4">
+    <span className="font-headline-sm text-headline-sm font-bold text-primary">{index + 1}</span>
+    <div className="flex flex-col gap-0.5">
+      <span className="font-label-bold text-label-bold text-text-heading">
+        {FACTOR_TITLES[factor.code] ?? factor.code}
+      </span>
+      <span className="font-body-md text-body-md text-on-surface-variant">{factor.message}</span>
+    </div>
   </li>
 );
 
@@ -259,8 +281,8 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
             ) : (
               // Ya vienen ordenados por impacto desde buildProjectDetail (§16) — no se reordenan aquí.
               <ol className="divide-y divide-outline-variant/50">
-                {factors.map((factor) => (
-                  <FactorRow key={factor.code} factor={factor} />
+                {factors.map((factor, index) => (
+                  <FactorRow key={factor.code} factor={factor} index={index} />
                 ))}
               </ol>
             )}

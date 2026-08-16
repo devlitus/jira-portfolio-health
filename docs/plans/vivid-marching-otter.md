@@ -148,8 +148,8 @@ Objetivo: selector de proyecto por tabs, gráfico de tendencia real, barras de d
 
 ### Tarea E.4 — "Why?" con tarjetas numeradas
 
-- [ ] Mapa estático `FACTOR_TITLES: Record<string, string>` (mismo patrón que `DIMENSION_LABELS`) para los 10 códigos reales de factor (`OVERDUE_ISSUES`, `STALLED_COMPLETION`, `THROUGHPUT_DECLINING`, `REOPENED_ISSUES`, `AGED_IN_PROGRESS_ISSUES`, `SCOPE_GROWTH`, `CAPACITY_OVERLOAD`, `BLOCKED_ISSUES`, `AGED_BLOCKERS`, `EXTERNAL_DEPENDENCIES` — ver `src/health/dimensions.ts`), con títulos cortos tipo "Capacity overload", "Scope growth", etc.
-- [ ] Redisear `FactorRow`: numeral grande en azul (posición en la lista, 1-indexado) + título (`FACTOR_TITLES[factor.code]`, fallback al propio `code` si falta alguno) + `factor.message` debajo. Quitar el patrón `ExplainerTooltip`/hover (ya no aplica: el mensaje pasa a estar siempre visible, no detrás de un tooltip — mejora de accesibilidad, no regresión).
+- [x] Mapa estático `FACTOR_TITLES: Record<string, string>` (mismo patrón que `DIMENSION_LABELS`) para los 10 códigos reales de factor (`OVERDUE_ISSUES`, `STALLED_COMPLETION`, `THROUGHPUT_DECLINING`, `REOPENED_ISSUES`, `AGED_IN_PROGRESS_ISSUES`, `SCOPE_GROWTH`, `CAPACITY_OVERLOAD`, `BLOCKED_ISSUES`, `AGED_BLOCKERS`, `EXTERNAL_DEPENDENCIES` — ver `src/health/dimensions.ts`), con títulos cortos tipo "Capacity overload", "Scope growth", etc.
+- [x] Redisear `FactorRow`: numeral grande en azul (posición en la lista, 1-indexado) + título (`FACTOR_TITLES[factor.code]`, fallback al propio `code` si falta alguno) + `factor.message` debajo. Quitar el patrón `ExplainerTooltip`/hover (ya no aplica: el mensaje pasa a estar siempre visible, no detrás de un tooltip — mejora de accesibilidad, no regresión).
 - **DoD:** factores siguen sin reordenarse en cliente (ya vienen ordenados por impacto); los 10 códigos tienen título mapeado (test o revisión manual contra `dimensions.ts`).
 
 ### Tarea E.5 — Quitar "Recommended actions" inline, añadir CTA
