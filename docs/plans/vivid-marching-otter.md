@@ -50,10 +50,10 @@ Objetivo: reemplazar el sidebar de `AppShell.tsx` por la barra de tabs del proto
 
 ### Tarea B.1 — Reescribir `AppShell.tsx`
 
-- [ ] Reemplazar el `<aside>` sidebar + `<nav>` mobile actuales por una única barra horizontal: título "Portfolio Health" (no clicable) + 3 tabs (Dashboard / Recommended Actions / Setup) con subrayado azul (`border-primary-container`/`text-primary`) en el tab activo, `overflow-x-auto` para viewports angostos (Adaptación 10).
-- [ ] Nuevo tipo `AppShellView = 'dashboard' | 'recommended' | 'configuration'` (se quita `'detail'`: Project Detail ya no tiene representación propia en la nav — sigue resaltando "Dashboard" como hoy, mismo criterio que la Adaptación 4 del plan anterior).
-- [ ] Quitar la prop `detailProjectName` y el breadcrumb que dependía de ella (Project Detail ahora lleva su propio selector de proyecto y link "← All projects", Fase E).
-- [ ] Quitar el `<main>` con `lg:ml-64`/`pt-16` (ya no hay sidebar fijo); el contenido pasa a fluir bajo la barra de tabs con el mismo contenedor `mx-auto max-w-[1280px] px-margin py-stack-lg`.
+- [x] Reemplazar el `<aside>` sidebar + `<nav>` mobile actuales por una única barra horizontal: título "Portfolio Health" (no clicable) + 3 tabs (Dashboard / Recommended Actions / Setup) con subrayado azul (`border-primary-container`/`text-primary`) en el tab activo, `overflow-x-auto` para viewports angostos (Adaptación 10).
+- [x] Nuevo tipo `AppShellView = 'dashboard' | 'recommended' | 'configuration'` (se quita `'detail'`: Project Detail ya no tiene representación propia en la nav — sigue resaltando "Dashboard" como hoy, mismo criterio que la Adaptación 4 del plan anterior).
+- [x] Quitar la prop `detailProjectName` y el breadcrumb que dependía de ella (Project Detail ahora lleva su propio selector de proyecto y link "← All projects", Fase E).
+- [x] Quitar el `<main>` con `lg:ml-64`/`pt-16` (ya no hay sidebar fijo); el contenido pasa a fluir bajo la barra de tabs con el mismo contenedor `mx-auto max-w-[1280px] px-margin py-stack-lg`.
 - **DoD:** `AppShell` sigue siendo puro en props; ningún viewport queda sin forma de navegar a las 3 pantallas (probar `lg` y `md`/mobile).
 
 ### Tarea B.2 — Cablear `recommended` en `index.tsx`
