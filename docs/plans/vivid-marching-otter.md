@@ -111,9 +111,9 @@ Objetivo: nueva pantalla top-level que agrega recomendaciones de todos los proye
 
 ### Tarea D.2 — Carga en `index.tsx`
 
-- [ ] Nuevo estado `recommendedActions: RecommendedActionItem[] | null` + `reviewedKeys: Set<string>` (Adaptación 5, clave `${projectKey}:${code}`).
-- [ ] Al navegar a `status === 'recommended'`, si `recommendedActions` es `null`, disparar `invoke('getProjectDetail', { projectKey })` para cada `dashboard.projects[].projectKey` (`Promise.all`), pasar el resultado a `buildRecommendedActions`, guardar en estado. Refrescar (volver a `null`) cuando se corre un nuevo análisis (`runAnalysis`/`rerunAnalysis`) para no mostrar datos obsoletos.
-- [ ] Handler `toggleReviewed(projectKey, code)` que añade/quita de `reviewedKeys`.
+- [x] Nuevo estado `recommendedActions: RecommendedActionItem[] | null` + `reviewedKeys: Set<string>` (Adaptación 5, clave `${projectKey}:${code}`).
+- [x] Al navegar a `status === 'recommended'`, si `recommendedActions` es `null`, disparar `invoke('getProjectDetail', { projectKey })` para cada `dashboard.projects[].projectKey` (`Promise.all`), pasar el resultado a `buildRecommendedActions`, guardar en estado. Refrescar (volver a `null`) cuando se corre un nuevo análisis (`runAnalysis`/`rerunAnalysis`) para no mostrar datos obsoletos.
+- [x] Handler `toggleReviewed(projectKey, code)` que añade/quita de `reviewedKeys`.
 - **DoD:** entrar y salir de la pantalla repetidamente no dispara llamadas duplicadas innecesarias mientras `recommendedActions` siga poblado; errores de `invoke` caen en el mismo estado `error` que el resto de la app.
 
 ### Tarea D.3 — Componente `RecommendedActions.tsx`

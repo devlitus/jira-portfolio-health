@@ -11,6 +11,7 @@ import type { Project } from '../metrics/model';
 import type { DashboardSummary } from '../health/dashboard';
 import type { AttentionQueueEntry } from '../health/attentionQueue';
 import type { ProjectDetail as ProjectDetailData } from '../health/projectDetail';
+import { buildRecommendedActions, type RecommendedActionItem } from './lib/recommendedActions';
 
 // Custom UI app (see AGENTS.md's "UI approach: Custom UI" override): a plain
 // React tree bundled to static files and served by Forge, talking to the
@@ -52,6 +53,9 @@ const App: React.FC = () => {
   const [dashboard, setDashboard] = useState<DashboardSummary | null>(null);
   const [attentionQueue, setAttentionQueue] = useState<AttentionQueueEntry[]>([]);
   const [projectDetail, setProjectDetail] = useState<ProjectDetailData | null>(null);
+  const [recommendedActions, setRecommendedActions] = useState<RecommendedActionItem[] | null>(null);
+  // Adaptación 5: session-only state, `${projectKey}:${code}` keys, lost on reload — no KVS/resolver for this yet.
+  const [reviewedKeys, setReviewedKeys] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
   const [isRerunning, setIsRerunning] = useState(false);
 
@@ -94,6 +98,50 @@ const App: React.FC = () => {
     };
   }, []);
 
+  // Fetches recommendations lazily the first time the user reaches the
+  // screen (Tarea D.2) — `recommendedActions` starts `null` and is reset to
+  // `null` by startAnalysis/rerunAnalysis, so this only re-fires after a
+  // fresh analysis, not on every re-visit while the data is still populated.
+  useEffect(() => {
+    if (status !== 'recommended' || recommendedActions !== null || !dashboard) return;
+    const { projects } = dashboard;
+    let cancelled = false;
+
+    async function loadRecommendedActions() {
+      try {
+        const details = await Promise.all(
+          projects.map(
+            (project) => invoke('getProjectDetail', { projectKey: project.projectKey }) as Promise<ProjectDetailData>
+          )
+        );
+        if (cancelled) return;
+        setRecommendedActions(buildRecommendedActions(details));
+      } catch (err) {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : 'Failed to load recommended actions.');
+        setStatus('error');
+      }
+    }
+
+    loadRecommendedActions();
+    return () => {
+      cancelled = true;
+    };
+  }, [status, recommendedActions, dashboard]);
+
+  function toggleReviewed(projectKey: string, code: string) {
+    const key = `${projectKey}:${code}`;
+    setReviewedKeys((current) => {
+      const next = new Set(current);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+  }
+
   function toggleProject(projectKey: string) {
     setSelectedKeys((current) => {
       const next = new Set(current);
@@ -120,6 +168,7 @@ const App: React.FC = () => {
       ]);
       setDashboard(summary);
       setAttentionQueue(queue);
+      setRecommendedActions(null);
       setStatus('ready');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to analyze the portfolio.');
@@ -137,6 +186,7 @@ const App: React.FC = () => {
       ]);
       setDashboard(summary);
       setAttentionQueue(queue);
+      setRecommendedActions(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to re-run the analysis.');
       setStatus('error');
@@ -200,15 +250,52 @@ const App: React.FC = () => {
       return <ProjectDetail detail={projectDetail} onBack={() => setStatus('ready')} />;
     }
 
-    // Placeholder hasta la Fase D (Tarea D.2/D.3), que agrega la carga de
-    // `recommendedActions` y monta el componente `RecommendedActions` real.
     if (status === 'recommended') {
+      if (recommendedActions === null) {
+        return (
+          <section className="flex flex-col items-center gap-gutter py-stack-lg">
+            <Spinner label="Loading recommended actions" />
+            <p className="font-body-md text-body-md text-on-surface-variant">Loading recommended actions...</p>
+          </section>
+        );
+      }
+
+      // Placeholder hasta la Tarea D.3, que crea `RecommendedActions.tsx` con
+      // el diseño real (cards por severidad, iconos, botón "Mark reviewed"
+      // estilizado). Aquí solo se consumen `recommendedActions`/`toggleReviewed`
+      // (Tarea D.2) para dejarlos cableados de extremo a extremo.
       return (
         <section className="rounded-xl border border-outline-variant bg-surface p-6 shadow-sm">
           <h1 className="font-headline-lg text-headline-lg text-text-heading">Recommended Actions</h1>
           <p className="mt-2 font-body-md text-body-md text-on-surface-variant">
-            Coming soon — aggregated recommendations across your monitored projects.
+            {recommendedActions.length === 0
+              ? 'No recommendations right now — every monitored project looks healthy.'
+              : `${recommendedActions.length} recommendation${recommendedActions.length === 1 ? '' : 's'} across your monitored projects.`}
           </p>
+          {recommendedActions.length > 0 && (
+            <ul className="mt-4 flex flex-col gap-2">
+              {recommendedActions.map((item) => {
+                const key = `${item.projectKey}:${item.code}`;
+                return (
+                  <li
+                    key={key}
+                    className="flex items-center justify-between gap-2 font-body-sm text-body-sm text-on-surface-variant"
+                  >
+                    <span>
+                      {item.projectName} — {item.message}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => toggleReviewed(item.projectKey, item.code)}
+                      className="font-label-bold text-label-bold text-primary transition-colors hover:text-primary-container"
+                    >
+                      {reviewedKeys.has(key) ? 'Reviewed' : 'Mark reviewed'}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </section>
       );
     }
