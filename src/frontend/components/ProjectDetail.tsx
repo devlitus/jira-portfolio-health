@@ -17,6 +17,7 @@
 // por el backend en vez de inventar datos.
 import React from 'react';
 import type { DimensionDetail, DimensionName, ProjectDetail as ProjectDetailData } from '../../health/projectDetail';
+import type { DashboardProjectRow } from '../../health/dashboard';
 import type { HealthFactor } from '../../metrics/model';
 import type { Recommendation } from '../../health/recommendations';
 import { StatusBadge } from './ui/StatusBadge';
@@ -24,8 +25,39 @@ import { InfoIcon, WarningIcon } from './ui/icons';
 
 interface ProjectDetailProps {
   detail: ProjectDetailData;
+  /** Proyectos monitoreados para la tira de pills del selector (Tarea E.1); viene de `dashboard.projects`. */
+  allProjects: DashboardProjectRow[];
+  onSelectProject: (projectKey: string) => void;
   onBack: () => void;
 }
+
+// Tira de pills del selector de proyecto (Tarea E.1) — mismo par
+// activo/inactivo que los tabs de AppShell.tsx, pero como pills en vez de
+// subrayado (no son navegación de secciones, son selección dentro de la
+// misma pantalla).
+const PILL_BASE = 'shrink-0 rounded-full px-3 py-1.5 font-label-bold text-label-bold transition-colors';
+const PILL_ACTIVE = 'bg-secondary-container text-primary';
+const PILL_INACTIVE = 'text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface';
+
+const ProjectPills: React.FC<{
+  projects: DashboardProjectRow[];
+  activeProjectKey: string;
+  onSelectProject: (projectKey: string) => void;
+}> = ({ projects, activeProjectKey, onSelectProject }) => (
+  <div className="flex items-center gap-1 overflow-x-auto">
+    {projects.map((project) => (
+      <button
+        key={project.projectKey}
+        type="button"
+        onClick={() => onSelectProject(project.projectKey)}
+        aria-current={project.projectKey === activeProjectKey ? 'true' : undefined}
+        className={`${PILL_BASE} ${project.projectKey === activeProjectKey ? PILL_ACTIVE : PILL_INACTIVE}`}
+      >
+        {project.projectName}
+      </button>
+    ))}
+  </div>
+);
 
 const DIMENSION_LABELS: Record<DimensionName, string> = {
   schedule: 'Schedule',
@@ -99,8 +131,13 @@ const DimensionRow: React.FC<{ dimension: DimensionDetail }> = ({ dimension }) =
   </li>
 );
 
-export const ProjectDetail: React.FC<ProjectDetailProps> = ({ detail, onBack }) => {
-  const { projectName, healthScore, status, trend, dimensions, factors, recommendations, reason, reasonKind } =
+export const ProjectDetail: React.FC<ProjectDetailProps> = ({
+  detail,
+  allProjects,
+  onSelectProject,
+  onBack,
+}) => {
+  const { projectKey, projectName, healthScore, status, trend, dimensions, factors, recommendations, reason, reasonKind } =
     detail;
 
   return (
@@ -110,20 +147,26 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ detail, onBack }) 
         onClick={onBack}
         className="self-start font-label-bold text-label-bold text-primary transition-colors hover:text-primary-container"
       >
-        {'←'} Back to dashboard
+        {'←'} All projects
       </button>
 
-      <section className="rounded-xl border border-outline-variant bg-surface p-6 shadow-sm">
+      {allProjects.length > 0 && (
+        <ProjectPills projects={allProjects} activeProjectKey={projectKey} onSelectProject={onSelectProject} />
+      )}
+
+      <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-outline-variant bg-surface p-6 shadow-sm">
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="font-headline-lg text-headline-lg text-text-heading">{projectName}</h1>
           {status && <StatusBadge status={status} />}
         </div>
-        <p className="mt-2 font-body-md text-body-md text-on-surface-variant">
-          Health: {healthScore === null ? 'N/A' : healthScore}
-          {healthScore !== null && <span className="text-outline">/100</span>}
-        </p>
+        <div className="flex items-baseline gap-2">
+          <span className="font-display-hero text-display-hero text-text-heading">
+            {healthScore === null ? 'N/A' : healthScore}
+          </span>
+          <span className="font-headline-lg text-headline-lg text-outline">/100</span>
+        </div>
         {!reason && (
-          <p className="mt-2 font-data-mono text-data-mono text-on-surface-variant">Trend: {trend}</p>
+          <p className="w-full font-data-mono text-data-mono text-on-surface-variant">Trend: {trend}</p>
         )}
       </section>
 

@@ -248,7 +248,14 @@ const App: React.FC = () => {
     }
 
     if (status === 'detail' && projectDetail) {
-      return <ProjectDetail detail={projectDetail} onBack={() => setStatus('ready')} />;
+      return (
+        <ProjectDetail
+          detail={projectDetail}
+          allProjects={dashboard?.projects ?? []}
+          onSelectProject={selectProject}
+          onBack={() => setStatus('ready')}
+        />
+      );
     }
 
     if (status === 'recommended') {

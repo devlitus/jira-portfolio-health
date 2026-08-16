@@ -130,8 +130,8 @@ Objetivo: selector de proyecto por tabs, gráfico de tendencia real, barras de d
 
 ### Tarea E.1 — Selector de proyecto (tabs) + header
 
-- [ ] Nueva prop `allProjects: DashboardProjectRow[]` (de `dashboard.projects`, ya disponible en `index.tsx`) y `onSelectProject: (key) => void` (reusa la función `selectProject` existente). Tira horizontal de pills, una por proyecto monitoreado, resaltando el activo (`bg-secondary-container text-primary` o similar), sobre "← All projects" (mismo link que hoy, renombrado del actual "← Back to dashboard").
-- [ ] Header: nombre + `StatusBadge` a la izquierda, score grande (`display-hero` o un tamaño intermedio) + "Health / 100" a la derecha (antes era una sola línea "Health: 42/100").
+- [x] Nueva prop `allProjects: DashboardProjectRow[]` (de `dashboard.projects`, ya disponible en `index.tsx`) y `onSelectProject: (key) => void` (reusa la función `selectProject` existente). Tira horizontal de pills, una por proyecto monitoreado, resaltando el activo (`bg-secondary-container text-primary` o similar), sobre "← All projects" (mismo link que hoy, renombrado del actual "← Back to dashboard").
+- [x] Header: nombre + `StatusBadge` a la izquierda, score grande (`display-hero` o un tamaño intermedio) + "Health / 100" a la derecha (antes era una sola línea "Health: 42/100").
 - **DoD:** hacer clic en otro proyecto de la tira dispara `onSelectProject` y actualiza toda la pantalla sin pasar por Dashboard; el proyecto activo es visualmente distinguible.
 
 ### Tarea E.2 — `TrendChart` (gráfico de línea SVG)
