@@ -21,6 +21,7 @@ import type { DashboardProjectRow } from '../../health/dashboard';
 import type { HealthFactor } from '../../metrics/model';
 import type { Recommendation } from '../../health/recommendations';
 import { StatusBadge } from './ui/StatusBadge';
+import { TrendChart } from './ui/TrendChart';
 import { InfoIcon, WarningIcon } from './ui/icons';
 
 interface ProjectDetailProps {
@@ -165,10 +166,18 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
           </span>
           <span className="font-headline-lg text-headline-lg text-outline">/100</span>
         </div>
-        {!reason && (
-          <p className="w-full font-data-mono text-data-mono text-on-surface-variant">Trend: {trend}</p>
-        )}
       </section>
+
+      {!reason && (
+        <section className="overflow-hidden rounded-xl border border-outline-variant bg-surface shadow-sm">
+          <div className="border-b border-outline-variant bg-surface-slate p-4">
+            <h2 className="font-headline-sm text-headline-sm uppercase text-text-heading">
+              Trend — last 5 snapshots
+            </h2>
+          </div>
+          <TrendChart trend={trend} />
+        </section>
+      )}
 
       {reason ? (
         <section

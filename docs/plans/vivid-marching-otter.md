@@ -136,9 +136,9 @@ Objetivo: selector de proyecto por tabs, gráfico de tendencia real, barras de d
 
 ### Tarea E.2 — `TrendChart` (gráfico de línea SVG)
 
-- [ ] Crear `src/frontend/components/ui/TrendChart.tsx`: recibe el string `trend` (formato `formatTrendLine`, ej. `"78 → 71 → 64 → 55 → 42"`, o el placeholder `—`, o mezcla con `N/A`), lo parsea a puntos numéricos (ignora `N/A`/placeholder), dibuja un `<svg>` inline con `<polyline>` + `<circle>` por punto (azul, mismo `--color-primary-container`) escalado al rango de los datos, con las etiquetas de los valores debajo de cada punto (`data-mono`).
-- [ ] Estado sin datos suficientes (0 o 1 punto numérico): mensaje "Not enough history yet" en vez de un SVG vacío o roto.
-- [ ] Reemplazar la línea `Trend: {trend}` de `ProjectDetail.tsx` por `<TrendChart trend={trend} />` dentro de una card `TREND — LAST 5 SNAPSHOTS`.
+- [x] Crear `src/frontend/components/ui/TrendChart.tsx`: recibe el string `trend` (formato `formatTrendLine`, ej. `"78 → 71 → 64 → 55 → 42"`, o el placeholder `—`, o mezcla con `N/A`), lo parsea a puntos numéricos (ignora `N/A`/placeholder), dibuja un `<svg>` inline con `<polyline>` + `<circle>` por punto (azul, mismo `--color-primary-container`) escalado al rango de los datos, con las etiquetas de los valores debajo de cada punto (`data-mono`).
+- [x] Estado sin datos suficientes (0 o 1 punto numérico): mensaje "Not enough history yet" en vez de un SVG vacío o roto.
+- [x] Reemplazar la línea `Trend: {trend}` de `ProjectDetail.tsx` por `<TrendChart trend={trend} />` dentro de una card `TREND — LAST 5 SNAPSHOTS`.
 - **DoD:** con `trend === '—'` no rompe (muestra el estado "Not enough history"); con 5 puntos reales dibuja una polilínea proporcional sin librería externa.
 
 ### Tarea E.3 — Dimensiones como barras
