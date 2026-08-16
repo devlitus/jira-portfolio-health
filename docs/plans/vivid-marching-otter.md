@@ -84,9 +84,9 @@ Objetivo: pasar del hero de una sola card + barras de status a las 4 cards del p
 
 ### Tarea C.3 — Tabla "Health by Project"
 
-- [ ] Columna Health: quitar el punto de color (`STATUS_DOT_CLASS`) delante del número — el prototipo muestra el score en texto plano, el color ya lo lleva la columna Status.
-- [ ] Columna Trend: cambiar `TrendBadge` (badge circular con fondo) por una flecha plana coloreada (mismo criterio semántico ↑ verde / ↓ rojo / → ámbar / — gris, pero sin el círculo de fondo) — evaluar si esto se resuelve con una prop `variant="plain"` en `TrendBadge` o un componente nuevo; **no** eliminar `TrendBadge` en sí porque `AttentionQueue`/Tarea C.2 lo sigue usando en su forma actual.
-- [ ] Conservar zebra, badge de alertas (`⚠`) y subtítulo `projectKey` bajo el nombre — el prototipo no los muestra en su dataset de demo (sin alertas), pero son datos reales existentes que no hay motivo para quitar.
+- [x] Columna Health: quitar el punto de color (`STATUS_DOT_CLASS`) delante del número — el prototipo muestra el score en texto plano, el color ya lo lleva la columna Status.
+- [x] Columna Trend: cambiar `TrendBadge` (badge circular con fondo) por una flecha plana coloreada (mismo criterio semántico ↑ verde / ↓ rojo / → ámbar / — gris, pero sin el círculo de fondo) — evaluar si esto se resuelve con una prop `variant="plain"` en `TrendBadge` o un componente nuevo; **no** eliminar `TrendBadge` en sí porque `AttentionQueue`/Tarea C.2 lo sigue usando en su forma actual.
+- [x] Conservar zebra, badge de alertas (`⚠`) y subtítulo `projectKey` bajo el nombre — el prototipo no los muestra en su dataset de demo (sin alertas), pero son datos reales existentes que no hay motivo para quitar.
 - **DoD:** los 3 casos de `reasonKind` (`no-analysis`/`failed`/`insufficient-data`) se siguen distinguiendo visualmente; fila sigue siendo clicable.
 
 ### Tarea C.4 — "Recent Alerts" (se conserva, Adaptación 7)

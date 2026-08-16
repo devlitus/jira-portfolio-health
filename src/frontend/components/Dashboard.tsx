@@ -5,7 +5,6 @@
 // just rendering.
 import React from 'react';
 import type { DashboardProjectRow, DashboardStatusCounts, DashboardSummary, PortfolioAlert } from '../../health/dashboard';
-import type { HealthStatus } from '../../metrics/model';
 import { StatusBadge } from './ui/StatusBadge';
 import { TrendBadge } from './ui/TrendBadge';
 import { CheckIcon, NotificationsIcon, WarningIcon } from './ui/icons';
@@ -112,14 +111,6 @@ const TopAttentionItem: React.FC<{ project: DashboardProjectRow }> = ({ project 
   </li>
 );
 
-// Status dot next to the score (Tarea C.2, code.html rows): same semantic
-// colors as StatusBadge/HEALTH_BAR_ROWS, just a smaller unlabeled dot.
-const STATUS_DOT_CLASS: Record<HealthStatus, string> = {
-  HEALTHY: 'bg-status-healthy',
-  AT_RISK: 'bg-status-at-risk',
-  CRITICAL: 'bg-status-critical',
-};
-
 const ProjectRow: React.FC<{
   project: DashboardProjectRow;
   isEven: boolean;
@@ -153,19 +144,14 @@ const ProjectRow: React.FC<{
       <div className="font-body-sm text-body-sm text-on-surface-variant">{project.projectKey}</div>
     </td>
     <td className="p-4 text-right">
-      {project.healthScore !== null && project.status ? (
-        <div className="flex items-center justify-end gap-2">
-          <div className={`h-2 w-2 rounded-full ${STATUS_DOT_CLASS[project.status]}`} />
-          <span className="font-data-mono text-data-mono font-bold text-text-heading">{project.healthScore}</span>
-        </div>
+      {project.healthScore !== null ? (
+        <span className="font-data-mono text-data-mono font-bold text-text-heading">{project.healthScore}</span>
       ) : (
         <span className="font-data-mono text-data-mono text-on-surface-variant">N/A</span>
       )}
     </td>
     <td className="p-4 text-center">
-      <div className="inline-flex">
-        <TrendBadge trend={project.trend} />
-      </div>
+      <TrendBadge trend={project.trend} variant="plain" />
     </td>
     <td className="p-4">
       {project.status ? (
