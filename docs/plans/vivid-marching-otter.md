@@ -187,6 +187,6 @@ Objetivo: alinear `ProjectSelector.tsx` y los estados `analyzing`/`error` de `in
 
 ### Tarea G.2 — Chequeo visual contra el prototipo
 
-- [ ] Levantar la app (skill `run`) y, por separado, el prototipo estático (receta en Contexto) para comparar lado a lado las 4 pantallas: Dashboard, Recommended Actions, Project Detail, Setup.
-- [ ] Spot-check en viewport `md`/mobile: la barra de tabs hace scroll horizontal en vez de romper el layout (Adaptación 10).
+- [x] Levantar la app (skill `run`) y, por separado, el prototipo estático (receta en Contexto) para comparar lado a lado las 4 pantallas: Dashboard, Recommended Actions, Project Detail, Setup.
+- [x] Spot-check en viewport `md`/mobile: la barra de tabs hace scroll horizontal en vez de romper el layout (Adaptación 10).
 - **DoD:** paleta semántica, tipografía y estructura de cards coinciden con el prototipo salvo las Adaptaciones documentadas arriba (chrome de Jira, sparkline, reglas fabricadas, persistencia de "reviewed").

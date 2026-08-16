@@ -99,18 +99,6 @@ const AlertRow: React.FC<{ alert: PortfolioAlert }> = ({ alert }) => (
   </li>
 );
 
-const TopAttentionItem: React.FC<{ project: DashboardProjectRow }> = ({ project }) => (
-  <li>
-    {project.projectName} — {project.healthScore}
-    {project.status && (
-      <>
-        {' '}
-        <StatusBadge status={project.status} />
-      </>
-    )}
-  </li>
-);
-
 const ProjectRow: React.FC<{
   project: DashboardProjectRow;
   isEven: boolean;
@@ -171,7 +159,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onRerunAnalysis,
   isRerunning,
 }) => {
-  const { overallHealth, statusCounts, projects, topAttention, alerts } = summary;
+  const { overallHealth, statusCounts, projects, alerts } = summary;
 
   return (
     <section className="flex flex-col gap-gutter">
@@ -203,19 +191,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
           />
         ))}
       </div>
-
-      <section>
-        <h2>Top Attention</h2>
-        {topAttention.length === 0 ? (
-          <p>No projects with a calculated health score yet.</p>
-        ) : (
-          <ol>
-            {topAttention.map((project) => (
-              <TopAttentionItem key={project.projectKey} project={project} />
-            ))}
-          </ol>
-        )}
-      </section>
 
       <section className="overflow-hidden rounded-xl border border-outline-variant bg-surface shadow-sm">
         <div className="border-b border-outline-variant bg-surface-slate p-4">
