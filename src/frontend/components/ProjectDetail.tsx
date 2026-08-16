@@ -18,11 +18,20 @@
 import React from 'react';
 import type { DimensionDetail, DimensionName, ProjectDetail as ProjectDetailData } from '../../health/projectDetail';
 import type { DashboardProjectRow } from '../../health/dashboard';
-import type { HealthFactor } from '../../metrics/model';
+import type { HealthFactor, HealthStatus } from '../../metrics/model';
 import type { Recommendation } from '../../health/recommendations';
 import { StatusBadge } from './ui/StatusBadge';
 import { TrendChart } from './ui/TrendChart';
-import { InfoIcon, WarningIcon } from './ui/icons';
+import {
+  CalendarIcon,
+  InfoIcon,
+  LayersIcon,
+  LinkIcon,
+  PackageIcon,
+  UsersIcon,
+  WarningIcon,
+  type IconProps,
+} from './ui/icons';
 
 interface ProjectDetailProps {
   detail: ProjectDetailData;
@@ -66,6 +75,23 @@ const DIMENSION_LABELS: Record<DimensionName, string> = {
   scope: 'Scope',
   capacity: 'Capacity',
   dependencies: 'Dependencies',
+};
+
+// Tarea E.3: un icono por dimensión (Fase A) en vez del texto plano de antes.
+const DIMENSION_ICONS: Record<DimensionName, React.FC<IconProps>> = {
+  schedule: CalendarIcon,
+  delivery: PackageIcon,
+  scope: LayersIcon,
+  capacity: UsersIcon,
+  dependencies: LinkIcon,
+};
+
+// Mismo mapeo status → color que `StatusBadge`/`Dashboard.tsx` (Tarea C.1),
+// aplicado al fill de la barra de dimensión en vez de a un badge.
+const DIMENSION_BAR_CLASS: Record<HealthStatus, string> = {
+  HEALTHY: 'bg-status-healthy',
+  AT_RISK: 'bg-status-at-risk',
+  CRITICAL: 'bg-status-critical',
 };
 
 function formatImpact(impact: number): string {
@@ -118,19 +144,32 @@ const RecommendationRow: React.FC<{ recommendation: Recommendation; factors: Hea
   );
 };
 
-const DimensionRow: React.FC<{ dimension: DimensionDetail }> = ({ dimension }) => (
-  <li className="flex items-center justify-between p-4">
-    <span className="font-label-bold text-label-bold text-text-heading">{DIMENSION_LABELS[dimension.name]}</span>
-    {dimension.score === null || dimension.status === null ? (
-      <span className="font-body-sm text-body-sm text-on-surface-variant">N/A — Insufficient data</span>
-    ) : (
-      <span className="flex items-center gap-2">
-        <span className="font-data-mono text-data-mono font-bold text-text-heading">{dimension.score}</span>
-        <StatusBadge status={dimension.status} />
+const DimensionRow: React.FC<{ dimension: DimensionDetail }> = ({ dimension }) => {
+  const Icon = DIMENSION_ICONS[dimension.name];
+  return (
+    <li className="flex items-center gap-3 p-4">
+      <Icon size={20} className="shrink-0 text-on-surface-variant" />
+      <span className="w-28 shrink-0 font-label-bold text-label-bold text-text-heading">
+        {DIMENSION_LABELS[dimension.name]}
       </span>
-    )}
-  </li>
-);
+      {dimension.score === null || dimension.status === null ? (
+        <span className="flex-1 font-body-sm text-body-sm text-on-surface-variant">N/A — Insufficient data</span>
+      ) : (
+        <>
+          <div className="h-2 flex-1 overflow-hidden rounded-full bg-surface-slate">
+            <div
+              className={`h-full rounded-full ${DIMENSION_BAR_CLASS[dimension.status]}`}
+              style={{ width: `${dimension.score}%` }}
+            />
+          </div>
+          <span className="w-10 shrink-0 text-right font-data-mono text-data-mono font-bold text-text-heading">
+            {dimension.score}
+          </span>
+        </>
+      )}
+    </li>
+  );
+};
 
 export const ProjectDetail: React.FC<ProjectDetailProps> = ({
   detail,

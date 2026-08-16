@@ -143,7 +143,7 @@ Objetivo: selector de proyecto por tabs, gráfico de tendencia real, barras de d
 
 ### Tarea E.3 — Dimensiones como barras
 
-- [ ] Redisear `DimensionRow`: icono por dimensión (Fase A: Calendar/Package/Layers/Users/Link), label, barra horizontal (`h-2 rounded-full`, ancho `${score}%`, color por `status` reusando `STATUS_DOT_CLASS`-equivalente ya usado en Dashboard/AttentionQueue), score numérico a la derecha. Caso `null` conserva el texto "N/A — Insufficient data" (sin barra, o barra vacía gris) — mismo criterio §12/§24 que hoy.
+- [x] Redisear `DimensionRow`: icono por dimensión (Fase A: Calendar/Package/Layers/Users/Link), label, barra horizontal (`h-2 rounded-full`, ancho `${score}%`, color por `status` reusando `STATUS_DOT_CLASS`-equivalente ya usado en Dashboard/AttentionQueue), score numérico a la derecha. Caso `null` conserva el texto "N/A — Insufficient data" (sin barra, o barra vacía gris) — mismo criterio §12/§24 que hoy.
 - **DoD:** los 3 casos (dimensión con score, dimensión `null`, proyecto sin análisis) se distinguen igual que antes, ahora con barra en vez de `StatusBadge` por fila.
 
 ### Tarea E.4 — "Why?" con tarjetas numeradas
