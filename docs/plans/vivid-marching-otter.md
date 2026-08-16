@@ -154,8 +154,8 @@ Objetivo: selector de proyecto por tabs, gráfico de tendencia real, barras de d
 
 ### Tarea E.5 — Quitar "Recommended actions" inline, añadir CTA
 
-- [ ] Eliminar la sección "Recommended actions" (lista + `RecommendationRow`) de `ProjectDetail.tsx` — pasa a vivir solo en la pantalla global (Fase D, Adaptación 6).
-- [ ] Añadir botón "View recommended actions →" al final de la pantalla, nueva prop `onViewRecommendedActions: () => void` conectada en `index.tsx` a `setStatus('recommended')`.
+- [x] Eliminar la sección "Recommended actions" (lista + `RecommendationRow`) de `ProjectDetail.tsx` — pasa a vivir solo en la pantalla global (Fase D, Adaptación 6).
+- [x] Añadir botón "View recommended actions →" al final de la pantalla, nueva prop `onViewRecommendedActions: () => void` conectada en `index.tsx` a `setStatus('recommended')`.
 - **DoD:** `Recommendation`/`RecommendationRow` quedan sin referencias muertas en `ProjectDetail.tsx` (`npm run lint` no marca imports sin usar).
 
 ---

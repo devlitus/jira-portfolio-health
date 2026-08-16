@@ -254,6 +254,7 @@ const App: React.FC = () => {
           allProjects={dashboard?.projects ?? []}
           onSelectProject={selectProject}
           onBack={() => setStatus('ready')}
+          onViewRecommendedActions={() => setStatus('recommended')}
         />
       );
     }
