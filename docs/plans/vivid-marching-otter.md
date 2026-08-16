@@ -78,8 +78,8 @@ Objetivo: pasar del hero de una sola card + barras de status a las 4 cards del p
 
 ### Tarea C.2 — "Today's Attention" (dentro de Dashboard, ya no en `AttentionQueue.tsx` separado)
 
-- [ ] En el prototipo, "Today's Attention" vive como sección propia del Dashboard (no un componente aparte con su propio marco de card) — mover su renderizado a `Dashboard.tsx` como 3 cards en fila (`grid-cols-1 md:grid-cols-3`), cada una: badge de status arriba-izq, score bold arriba-der, nombre de proyecto, línea de deterioro (`deteriorationLabel`, ya existe), línea de contexto (`mainIssue`, ya existe, sin el icono `info` que tiene hoy).
-- [ ] Decidir entre mover el componente `AttentionQueue.tsx` completo a `Dashboard.tsx` o mantenerlo como archivo separado pero re-estilizado a 3-cards-en-fila en vez de lista vertical de 1 columna; cualquiera de las dos es válida mientras `index.tsx` siga pasándole `attentionQueue`/`onSelectProject` sin cambios de contrato.
+- [x] En el prototipo, "Today's Attention" vive como sección propia del Dashboard (no un componente aparte con su propio marco de card) — mover su renderizado a `Dashboard.tsx` como 3 cards en fila (`grid-cols-1 md:grid-cols-3`), cada una: badge de status arriba-izq, score bold arriba-der, nombre de proyecto, línea de deterioro (`deteriorationLabel`, ya existe), línea de contexto (`mainIssue`, ya existe, sin el icono `info` que tiene hoy).
+- [x] Decidir entre mover el componente `AttentionQueue.tsx` completo a `Dashboard.tsx` o mantenerlo como archivo separado pero re-estilizado a 3-cards-en-fila en vez de lista vertical de 1 columna; cualquiera de las dos es válida mientras `index.tsx` siga pasándole `attentionQueue`/`onSelectProject` sin cambios de contrato.
 - **DoD:** `entries.length === 0` sigue mostrando el estado vacío existente ("Nothing needs attention"); `onSelectProject` se conserva.
 
 ### Tarea C.3 — Tabla "Health by Project"
