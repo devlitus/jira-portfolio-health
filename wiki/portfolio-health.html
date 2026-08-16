@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio Health for Jira — Wiki de proyecto</title>
+<style>
+  :root {
+    --bg: #faf8ff;
+    --surface: #ffffff;
+    --surface-alt: #f4f5f7;
+    --surface-container: #ededf8;
+    --border: #dfe1e6;
+    --border-soft: #e7e9ee;
+    --text-heading: #172b4d;
+    --text-body: #42526e;
+    --text-muted: #6b7793;
+    --primary: #0052cc;
+    --primary-deep: #003d9b;
+    --primary-tint: #eef3ff;
+    --status-healthy: #36b37e;
+    --status-healthy-tint: #e3f8ef;
+    --status-at-risk: #ffab00;
+    --status-at-risk-tint: #fff6e0;
+    --status-critical: #ff5630;
+    --status-critical-tint: #ffe9e3;
+    --shadow-card: 0 1px 2px rgba(23, 43, 77, 0.06), 0 1px 1px rgba(23, 43, 77, 0.04);
+    --font-sans: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", "Roboto Mono", Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12141c;
+      --surface: #1a1d28;
+      --surface-alt: #20232f;
+      --surface-container: #262a38;
+      --border: #333748;
+      --border-soft: #2a2d3b;
+      --text-heading: #edf0fa;
+      --text-body: #b7bfd6;
+      --text-muted: #8890a8;
+      --primary: #7ea2ff;
+      --primary-deep: #a8c0ff;
+      --primary-tint: #1d2740;
+      --status-healthy: #4ecb95;
+      --status-healthy-tint: #163229;
+      --status-at-risk: #ffc44d;
+      --status-at-risk-tint: #362a10;
+      --status-critical: #ff8a75;
+      --status-critical-tint: #3a1d18;
+      --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #12141c;
+    --surface: #1a1d28;
+    --surface-alt: #20232f;
+    --surface-container: #262a38;
+    --border: #333748;
+    --border-soft: #2a2d3b;
+    --text-heading: #edf0fa;
+    --text-body: #b7bfd6;
+    --text-muted: #8890a8;
+    --primary: #7ea2ff;
+    --primary-deep: #a8c0ff;
+    --primary-tint: #1d2740;
+    --status-healthy: #4ecb95;
+    --status-healthy-tint: #163229;
+    --status-at-risk: #ffc44d;
+    --status-at-risk-tint: #362a10;
+    --status-critical: #ff8a75;
+    --status-critical-tint: #3a1d18;
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text-body);
+    font-family: var(--font-sans);
+    font-size: 15.5px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+  }
+
+  h1, h2, h3, h4 { color: var(--text-heading); text-wrap: balance; margin: 0; }
+
+  a { color: var(--primary); }
+
+  .wrap { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+  .prose { max-width: 700px; }
+
+  /* ---------- Nav ---------- */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .nav-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    height: 52px;
+  }
+  .nav-brand {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--text-heading);
+    white-space: nowrap;
+  }
+  .nav-links {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links a {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    padding: 6px 10px;
+    border-radius: 0.375rem;
+    transition: color 0.15s, background 0.15s;
+  }
+  .nav-links a:hover { color: var(--text-heading); background: var(--surface-alt); }
+  .nav-links a.active { color: var(--primary); background: var(--primary-tint); }
+
+  /* ---------- Header ---------- */
+  header.hero {
+    padding: 56px 0 40px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--status-healthy);
+    display: inline-block;
+  }
+  h1.title {
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.15;
+    margin-top: 10px;
+  }
+  .tagline {
+    margin-top: 14px;
+    font-size: 17px;
+    color: var(--text-body);
+    max-width: 620px;
+  }
+  .tagline strong { color: var(--text-heading); font-weight: 600; }
+
+  /* ---------- Progress strip ---------- */
+  .progress-card {
+    margin-top: 32px;
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow-card);
+    padding: 20px 24px;
+  }
+  .progress-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    margin-bottom: 14px;
+  }
+  .progress-head .label {
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .progress-head .summary {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-body);
+  }
+  .progress-head .summary b { color: var(--status-healthy); font-weight: 700; }
+  .progress-head .summary .amber { color: var(--status-at-risk); font-weight: 700; }
+
+  .segments {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+  }
+  .segment {
+    height: 8px;
+    border-radius: 0.125rem;
+    background: var(--status-healthy);
+  }
+  .segment.active { background: var(--status-at-risk); }
+
+  .phase-labels {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+    margin-top: 8px;
+  }
+  .phase-labels span {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  /* ---------- Sections ---------- */
+  section.block { padding: 56px 0; border-bottom: 1px solid var(--border-soft); }
+  section.block:last-of-type { border-bottom: none; }
+
+  .section-head { margin-bottom: 28px; }
+  .section-head .eyebrow { margin-bottom: 8px; }
+  .section-head .eyebrow::before { background: var(--primary); }
+  h2.section-title { font-size: 24px; font-weight: 700; letter-spacing: -0.01em; }
+  .section-sub { margin-top: 8px; color: var(--text-muted); font-size: 14.5px; max-width: 640px; }
+
+  .prose p { margin: 0 0 14px; }
+  .prose ul, .prose ol { margin: 0 0 14px; padding-left: 22px; }
+  .prose li { margin-bottom: 6px; }
+  .prose blockquote {
+    margin: 20px 0;
+    padding: 4px 0 4px 16px;
+    border-left: 3px solid var(--primary);
+    color: var(--text-heading);
+    font-size: 16px;
+    font-style: italic;
+  }
+  h3.h { font-size: 13px; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; color: var(--text-heading); margin: 28px 0 12px; }
+  h3.h:first-child { margin-top: 0; }
+
+  /* ---------- Cards / grids ---------- */
+  .grid { display: grid; gap: 14px; }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 640px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: 0.5rem;
+    padding: 18px 20px;
+    box-shadow: var(--shadow-card);
+  }
+  .card h4 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+  .card p { margin: 0; font-size: 13.5px; color: var(--text-body); }
+  .card .kicker {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  /* ---------- Status chip ---------- */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 3px 9px;
+    border-radius: 9999px;
+    white-space: nowrap;
+  }
+  .chip::before { content: ""; width: 6px; height: 6px; border-radius: 50%; }
+  .chip.healthy { background: var(--status-healthy-tint); color: var(--status-healthy); }
+  .chip.healthy::before { background: var(--status-healthy); }
+  .chip.risk { background: var(--status-at-risk-tint); color: var(--status-at-risk); }
+  .chip.risk::before { background: var(--status-at-risk); }
+  .chip.mitigated {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+  .chip.mitigated::before { background: var(--text-muted); }
+  .chip.decision {
+    background: transparent;
+    border: 1px solid color-mix(in srgb, var(--status-at-risk) 45%, transparent);
+    color: var(--status-at-risk);
+  }
+  .chip.decision::before { background: var(--status-at-risk); }
+
+  /* ---------- Table ---------- */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border-soft); border-radius: 0.5rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 560px; }
+  thead th {
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: var(--surface-alt);
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  tbody td { padding: 11px 16px; border-bottom: 1px solid var(--border-soft); vertical-align: top; color: var(--text-body); }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:nth-child(even) { background: var(--surface-alt); }
+  td.phase-id { font-family: var(--font-mono); color: var(--text-muted); white-space: nowrap; }
+  td.phase-name { color: var(--text-heading); font-weight: 600; }
+
+  /* ---------- Lists with icons ---------- */
+  .check-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; }
+  .check-list li { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; }
+  .check-list li::before {
+    content: "";
+    flex: none;
+    width: 15px; height: 15px;
+    margin-top: 2px;
+    border-radius: 50%;
+    background: var(--status-healthy-tint);
+    background-image: linear-gradient(var(--status-healthy), var(--status-healthy));
+    background-size: 7px 7px;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  .scope-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 640px) { .scope-cols { grid-template-columns: 1fr; } }
+  .scope-cols ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .scope-cols li { font-size: 13.5px; padding-left: 16px; position: relative; }
+  .scope-cols .in li::before { content: "+"; position: absolute; left: 0; color: var(--status-healthy); font-weight: 700; }
+  .scope-cols .out li::before { content: "\2013"; position: absolute; left: 0; color: var(--text-muted); }
+  .scope-cols .out li { color: var(--text-muted); }
+  .scope-cols h4 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 10px; color: var(--text-heading); }
+
+  /* ---------- Callout ---------- */
+  .callout {
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 0.375rem;
+    background: var(--primary-tint);
+    border: 1px solid color-mix(in srgb, var(--primary) 25%, transparent);
+    font-size: 13.5px;
+    color: var(--text-body);
+    margin-top: 20px;
+  }
+  .callout .dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--primary); margin-top: 5px; }
+  .callout strong { color: var(--text-heading); }
+
+  /* ---------- Task rows (pending) ---------- */
+  .task-row {
+    display: flex;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .task-row:last-child { border-bottom: none; }
+  .task-row .n {
+    flex: none;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--status-at-risk);
+    background: var(--status-at-risk-tint);
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .task-row h4 { font-size: 14px; margin-bottom: 3px; }
+  .task-row p { margin: 0; font-size: 13.5px; color: var(--text-body); }
+
+  /* ---------- Risk list ---------- */
+  .risk-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .risk-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 12px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: 0.375rem;
+  }
+  .risk-item p { margin: 0; font-size: 13.5px; }
+  .risk-item .t { display: block; color: var(--text-heading); font-weight: 600; margin-bottom: 3px; }
+
+  /* ---------- Hypotheses ---------- */
+  .hyp-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .hyp-list li {
+    font-size: 13.5px;
+    padding: 10px 14px;
+    background: var(--surface-alt);
+    border-radius: 0.375rem;
+    display: flex;
+    gap: 10px;
+  }
+  .hyp-list .tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--primary);
+    flex: none;
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    padding: 40px 0 64px;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+  footer a { color: var(--text-muted); text-decoration: underline; text-underline-offset: 2px; }
+  footer .updated { font-family: var(--font-mono); font-size: 11.5px; margin-bottom: 6px; }
+
+  @media (max-width: 640px) {
+    header.hero { padding: 40px 0 32px; }
+    h1.title { font-size: 27px; }
+    section.block { padding: 40px 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="nav-inner">
+    <span class="nav-brand">PORTFOLIO&nbsp;HEALTH</span>
+    <nav class="nav-links" id="navLinks">
+      <a href="#resumen">Resumen</a>
+      <a href="#estado">Estado</a>
+      <a href="#decisiones">Decisiones</a>
+      <a href="#proximos">Próximos pasos</a>
+      <a href="#naming">Nombre</a>
+    </nav>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">Wiki de proyecto</span>
+    <h1 class="title">Portfolio Health for Jira</h1>
+    <p class="tagline">
+      Addon para Jira Cloud que responde una pregunta muy concreta: <strong>¿qué proyectos necesitan atención y por qué?</strong>
+      Este documento resume el proyecto a nivel ejecutivo — qué es, en qué estado está y qué queda por hacer.
+    </p>
+
+    <div class="progress-card">
+      <div class="progress-head">
+        <span class="label">Avance del MVP · 7 fases</span>
+        <span class="summary"><b>6 completas</b> &nbsp;·&nbsp; <span class="amber">1 en progreso</span></span>
+      </div>
+      <div class="segments">
+        <div class="segment"></div>
+        <div class="segment"></div>
+        <div class="segment"></div>
+        <div class="segment"></div>
+        <div class="segment"></div>
+        <div class="segment"></div>
+        <div class="segment active"></div>
+      </div>
+      <div class="phase-labels">
+        <span>F0</span><span>F1</span><span>F2</span><span>F3</span><span>F4</span><span>F5</span><span>F6</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- ============ RESUMEN ============ -->
+  <section class="block" id="resumen">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">01 · Qué es</span>
+        <h2 class="section-title">Resumen del proyecto</h2>
+        <p class="section-sub">El problema que resuelve, para quién, y cómo funciona a alto nivel.</p>
+      </div>
+
+      <div class="prose">
+        <p>
+          Un portfolio puede tener cientos de issues repartidos en varios proyectos. Jira permite consultarlos,
+          pero no responde directamente preguntas como <em>¿qué proyecto está empeorando?</em> o
+          <em>¿dónde está creciendo el alcance sin control?</em> El addon convierte esos datos en una
+          <strong>cola de atención priorizada</strong>, en vez de obligar a revisar cada proyecto a mano.
+        </p>
+        <blockquote>"Know which projects need attention before they become problems."</blockquote>
+      </div>
+
+      <h3 class="h">A quién va dirigido</h3>
+      <div class="grid grid-2">
+        <div class="card">
+          <span class="kicker">Usuario principal</span>
+          <h4>PMO / Project Manager / Engineering Manager</h4>
+          <p>Supervisa varios proyectos a la vez y hoy no tiene forma rápida de saber cuáles están en riesgo sin entrar proyecto a proyecto.</p>
+        </div>
+        <div class="card">
+          <span class="kicker">Usuario secundario</span>
+          <h4>Administrador de Jira</h4>
+          <p>Necesita que la instalación sea simple, con permisos claros y sin mantenimiento continuo.</p>
+        </div>
+      </div>
+
+      <h3 class="h">Cómo funciona</h3>
+      <div class="prose">
+        <ol>
+          <li>El usuario selecciona qué proyectos de Jira quiere monitorizar.</li>
+          <li>La app analiza cada proyecto en 5 dimensiones: <strong>Schedule</strong>, <strong>Delivery</strong>, <strong>Scope</strong>, <strong>Capacity</strong> y <strong>Dependencies</strong>.</li>
+          <li>Cada dimensión produce un score explicado — nunca solo un número, siempre con el motivo.</li>
+          <li>Los scores se combinan en un <strong>Health Score</strong> general por proyecto.</li>
+          <li>El dashboard prioriza los peor puntuados en una <strong>Attention Queue</strong>, con una recomendación por cada uno.</li>
+          <li>Cada día la app guarda una foto del estado, para mostrar tendencia y detectar deterioro.</li>
+        </ol>
+      </div>
+
+      <h3 class="h">Principios de producto</h3>
+      <div class="grid grid-2">
+        <div class="card">
+          <h4>Configuración mínima</h4>
+          <p>Instalar → seleccionar proyectos → ver resultados. Sin campos personalizados ni setup complejo.</p>
+        </div>
+        <div class="card">
+          <h4>Explicable siempre</h4>
+          <p>Ningún score se muestra sin su porqué: factores concretos detrás de cada número.</p>
+        </div>
+        <div class="card">
+          <h4>Accionable</h4>
+          <p>Cada problema relevante viene con una recomendación concreta, no solo un diagnóstico.</p>
+        </div>
+        <div class="card">
+          <h4>Sin IA en el MVP</h4>
+          <p>Cálculo determinista y reproducible. La IA queda como posible mejora futura, no parte del MVP.</p>
+        </div>
+      </div>
+
+      <h3 class="h">Alcance</h3>
+      <div class="scope-cols">
+        <div>
+          <h4>Incluye el MVP</h4>
+          <ul class="in">
+            <li>Selección de proyectos y dashboard de portfolio</li>
+            <li>Health Score y ranking de proyectos</li>
+            <li>Las 5 dimensiones con explicación de factores</li>
+            <li>Detalle por proyecto y recomendaciones</li>
+            <li>Histórico, tendencia y alertas básicas</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Fuera de alcance (a propósito)</h4>
+          <ul class="out">
+            <li>Gantt, roadmap y time tracking</li>
+            <li>Gestión financiera y OKRs</li>
+            <li>Resource planner avanzado y escenarios what-if</li>
+            <li>IA generativa e integración con Slack</li>
+            <li>Informes PDF y benchmarks entre clientes</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ESTADO ============ -->
+  <section class="block" id="estado">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">02 · Avance</span>
+        <h2 class="section-title">Estado actual</h2>
+        <p class="section-sub">El producto está funcionalmente completo: las 6 primeras fases están cerradas y con tests en verde. Queda por cerrar la fase final.</p>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Fase</th><th>Objetivo</th><th>Estado</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="phase-id">F0</td><td class="phase-name">Setup y decisiones técnicas</td><td><span class="chip healthy">Completa</span></td></tr>
+            <tr><td class="phase-id">F1</td><td class="phase-name">Foundation</td><td><span class="chip healthy">Completa</span></td></tr>
+            <tr><td class="phase-id">F2</td><td class="phase-name">Metrics</td><td><span class="chip healthy">Completa</span></td></tr>
+            <tr><td class="phase-id">F3</td><td class="phase-name">Health Engine</td><td><span class="chip healthy">Completa</span></td></tr>
+            <tr><td class="phase-id">F4</td><td class="phase-name">Dashboard</td><td><span class="chip healthy">Completa</span></td></tr>
+            <tr><td class="phase-id">F5</td><td class="phase-name">Historical data</td><td><span class="chip healthy">Completa</span></td></tr>
+            <tr><td class="phase-id">F6</td><td class="phase-name">Alerts + polish</td><td><span class="chip risk">En progreso</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="h">Qué funciona hoy</h3>
+      <ul class="check-list">
+        <li>Instalar la app y seleccionar qué proyectos monitorizar</li>
+        <li>Dashboard con salud general del portfolio y ranking por proyecto</li>
+        <li>Cola de atención priorizada con el motivo principal de cada problema</li>
+        <li>Detalle de proyecto: score de las 5 dimensiones, explicación y recomendaciones</li>
+        <li>Tendencia del score en el tiempo, con flechas de mejora/empeoramiento</li>
+        <li>Alertas automáticas (caída de score, cambio de estado, scope creep, dependencias críticas)</li>
+        <li>Manejo de casos límite (datos insuficientes, fallo de permisos, fallo de API) sin romper el dashboard</li>
+      </ul>
+
+      <h3 class="h">Lo que falta para cerrar la Fase 6</h3>
+      <div class="card" style="padding: 4px 20px;">
+        <div class="task-row">
+          <span class="n">1</span>
+          <div>
+            <h4>Telemetría mínima</h4>
+            <p>Registrar en logs eventos de uso (instalación, primer análisis, aperturas de dashboard, alertas) — sin contenido de issues.</p>
+          </div>
+        </div>
+        <div class="task-row">
+          <span class="n">2</span>
+          <div>
+            <h4>Validación final y release</h4>
+            <p>Checklist de requisitos del MVP, suite de tests completa, revisión de pre-release, README actualizado y decisión de despliegue a producción.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <span class="dot"></span>
+        <div><strong>Nota:</strong> la mayoría de tareas están verificadas por tests automáticos y desplegadas en el entorno de desarrollo. Algunas dejan pendiente una confirmación visual manual en el navegador — intencional, para no bloquear el avance — antes de dar el MVP por verificado en producción.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DECISIONES ============ -->
+  <section class="block" id="decisiones">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">03 · Por qué así</span>
+        <h2 class="section-title">Decisiones clave</h2>
+        <p class="section-sub">Las decisiones técnicas más relevantes, explicadas en términos simples.</p>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <h4>Dónde se guardan los datos</h4>
+          <p>Todo vive en el almacenamiento propio de Forge (la plataforma de Atlassian) — sin base de datos externa. Menos infraestructura que mantener, menos superficie de riesgo.</p>
+        </div>
+        <div class="card">
+          <h4>Qué datos puede ver el addon</h4>
+          <p>Siempre respeta los permisos de Jira del usuario: nunca muestra un proyecto o issue que esa persona no podría ver directamente en Jira.</p>
+        </div>
+        <div class="card">
+          <h4>Snapshot diario</h4>
+          <p>Una vez al día se guarda automáticamente una foto del estado de cada proyecto — sin intervención del usuario. Es lo que permite tendencia e histórico.</p>
+        </div>
+        <div class="card">
+          <h4>Sin IA en el MVP</h4>
+          <p>Mismas reglas, mismos datos → mismo resultado siempre. Menos riesgo en un número usado para decisiones, y sin enviar datos a servicios externos.</p>
+        </div>
+        <div class="card">
+          <h4>Interfaz construida a medida</h4>
+          <p>En vez del kit visual estándar de Atlassian, una interfaz React a medida — más esfuerzo, pero más control sobre cómo se ve y se siente el dashboard.</p>
+        </div>
+        <div class="card">
+          <h4>Sin datos = sin penalización</h4>
+          <p>Cuando falta información para una métrica, el addon nunca inventa un valor ni penaliza el score — muestra "N/A" explícitamente.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRÓXIMOS PASOS ============ -->
+  <section class="block" id="proximos">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">04 · Qué viene</span>
+        <h2 class="section-title">Próximos pasos y riesgos</h2>
+        <p class="section-sub">Qué falta antes del release, riesgos ya identificados, y cómo se validará el producto con usuarios reales.</p>
+      </div>
+
+      <h3 class="h">Riesgos técnicos conocidos <span style="text-transform:none; font-weight:400; color: var(--text-muted);">— identificados y ya mitigados en el diseño</span></h3>
+      <ul class="risk-list">
+        <li class="risk-item">
+          <p><span class="t">Límites de la API de Jira en portfolios grandes</span>Mitigado con reintentos automáticos y medición de rendimiento.</p>
+          <span class="chip mitigated">Mitigado</span>
+        </li>
+        <li class="risk-item">
+          <p><span class="t">Historial incompleto en proyectos antiguos</span>Algunas métricas quedan en "sin datos" en vez de un número — comportamiento esperado.</p>
+          <span class="chip mitigated">Mitigado</span>
+        </li>
+        <li class="risk-item">
+          <p><span class="t">Story points no estandarizados</span>El MVP cuenta issues salvo que el campo esté claramente identificado.</p>
+          <span class="chip mitigated">Mitigado</span>
+        </li>
+        <li class="risk-item">
+          <p><span class="t">Límite de tiempo del proceso diario en portfolios muy grandes</span>Se resolvería dividiendo el trabajo en lotes si aparece con uso real.</p>
+          <span class="chip mitigated">Mitigado</span>
+        </li>
+      </ul>
+
+      <h3 class="h">Después del MVP: validar con usuarios reales</h3>
+      <div class="prose">
+        <p>Antes de invertir en una v2, el plan contempla entrevistar al menos 10 usuarios de Jira para validar hipótesis:</p>
+      </div>
+      <ul class="hyp-list">
+        <li><span class="tag">H1</span> ¿Cuesta identificar proyectos en riesgo con Jira estándar?</li>
+        <li><span class="tag">H2</span> ¿Un score explicado es más útil que un dashboard lleno de métricas sueltas?</li>
+        <li><span class="tag">H3</span> ¿Se valoran más las recomendaciones que el número de score en sí?</li>
+        <li><span class="tag">H4</span> ¿La instalación sin configuración compleja mejora la adopción?</li>
+        <li><span class="tag">H5</span> ¿Los usuarios vuelven cada semana si la cola de atención es útil?</li>
+      </ul>
+
+      <div class="callout" style="margin-top: 24px;">
+        <span class="dot"></span>
+        <div><strong>Métrica de éxito:</strong> no el número de instalaciones, sino el porcentaje de usuarios activos que abre la cola de atención y revisa al menos un proyecto cada semana.</div>
+      </div>
+
+      <h3 class="h">Extensiones futuras <span style="text-transform:none; font-weight:400; color: var(--text-muted);">— fuera del MVP</span></h3>
+      <div class="prose">
+        <p style="color: var(--text-muted);">
+          Escenarios "what-if", predicción de cumplimiento de fecha, explicación por IA, notificaciones a Slack/email,
+          y salud financiera cuando existan datos fiables. Nada de esto está planificado para el MVP.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ NAMING ============ -->
+  <section class="block" id="naming">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">05 · A decidir juntos</span>
+        <h2 class="section-title">¿Encaja el nombre "Portfolio Health"?</h2>
+        <p class="section-sub">Punto abierto, no una decisión tomada — para valorar juntos antes de publicar en el Marketplace.</p>
+      </div>
+
+      <div class="prose">
+        <p>
+          Funcionalmente el nombre encaja: la app monitoriza <strong>varios proyectos a la vez</strong> para un
+          PMO/Engineering Manager, y "portfolio" es justo el término estándar de gestión de proyectos para esa
+          vista agregada. No es un nombre forzado.
+        </p>
+      </div>
+
+      <div class="risk-list">
+        <div class="risk-item" style="align-items: center;">
+          <p>
+            <span class="t">Riesgo de confusión de marca en el Marketplace</span>
+            Atlassian tuvo un producto llamado literalmente <strong>"Portfolio for Jira"</strong> (roadmapping/Gantt
+            entre proyectos), renombrado a <strong>"Advanced Roadmaps"</strong> en 2019. Este MVP explícitamente
+            <strong>no</strong> hace Gantt ni roadmap (fuera de alcance, ver Resumen) — alguien que recuerde el
+            producto antiguo puede esperar algo distinto de lo que la app realmente hace.
+          </p>
+          <span class="chip decision">Pendiente</span>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top: 20px;">
+        <span class="dot"></span>
+        <div>
+          <strong>Posible salida intermedia:</strong> mantener "portfolio" como concepto (vista agregada de varios
+          proyectos) pero no como primera palabra del nombre — por ejemplo <em>"Health Radar for Jira"</em> o
+          <em>"Attention Queue for Jira"</em> — para no chocar con el nombre legacy sin perder la idea de fondo.
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="updated">Última actualización: 2026-08-16</div>
+    <div>Documento de proyecto no técnico. El detalle completo (arquitectura, spec de datos, plan de tareas) vive en <code>wiki/</code> y <code>docs/</code> dentro del repositorio.</div>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var links = Array.prototype.slice.call(document.querySelectorAll('#navLinks a'));
+    var sections = links.map(function (l) { return document.querySelector(l.getAttribute('href')); });
+
+    function setActive(id) {
+      links.forEach(function (l) {
+        l.classList.toggle('active', l.getAttribute('href') === '#' + id);
+      });
+    }
+
+    if ('IntersectionObserver' in window) {
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) setActive(entry.target.id);
+        });
+      }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+
+      sections.forEach(function (s) { if (s) observer.observe(s); });
+    }
+  })();
+</script>
+
+</body>
+</html>
