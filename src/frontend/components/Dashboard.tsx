@@ -8,71 +8,72 @@ import type { DashboardProjectRow, DashboardStatusCounts, DashboardSummary, Port
 import type { HealthStatus } from '../../metrics/model';
 import { StatusBadge } from './ui/StatusBadge';
 import { TrendBadge } from './ui/TrendBadge';
-import { NotificationsIcon, WarningIcon } from './ui/icons';
+import { CheckIcon, NotificationsIcon, WarningIcon } from './ui/icons';
 
-// Bento hero card (Tarea C.1, DESIGN.md § Components "Health Progress Bars"):
-// one row per status with a dot, count and a proportional bar. `total` is the
-// number of *scored* projects (statusCounts sums), so a portfolio with no
-// scored projects yet renders empty bars instead of dividing by zero.
-// Literal class strings (not template interpolation) so Tailwind's static
-// scanner picks them up — see StatusBadge.tsx/TrendBadge.tsx for the same
-// pattern.
-const HEALTH_BAR_ROWS: {
+// Hero: "Overall health" + 3 status-count cards (Tarea C.1), reemplazando la
+// card ancha con barras proporcionales del diseño anterior (Adaptación 8: sin
+// sparkline — no hay serie histórica de overallHealth). Literal class strings
+// (no interpolación de template) para que el scanner estático de Tailwind las
+// detecte — mismo patrón que STATUS_DOT_CLASS/AlertRow.
+const STATUS_COUNT_CARDS: {
   key: keyof DashboardStatusCounts;
   label: string;
-  dotClass: string;
-  barClass: string;
-  tooltip: string;
+  borderClass: string;
+  iconClass: string;
+  icon: React.ReactNode;
 }[] = [
   {
     key: 'critical',
     label: 'Critical',
-    dotClass: 'bg-status-critical',
-    barClass: 'bg-status-critical',
-    tooltip: 'Health score below 60. Immediate attention required.',
+    borderClass: 'border-l-4 border-status-critical',
+    iconClass: 'text-status-critical',
+    icon: <WarningIcon size={22} />,
   },
   {
     key: 'atRisk',
     label: 'At Risk',
-    dotClass: 'bg-status-at-risk',
-    barClass: 'bg-status-at-risk',
-    tooltip: 'Health score 60–79. Potential blockers detected.',
+    borderClass: 'border-l-4 border-status-at-risk',
+    iconClass: 'text-status-at-risk',
+    icon: <WarningIcon size={22} />,
   },
   {
     key: 'healthy',
-    label: 'On Track',
-    dotClass: 'bg-status-healthy',
-    barClass: 'bg-status-healthy',
-    tooltip: 'Health score 80 and above. Proceeding to plan.',
+    label: 'Healthy',
+    borderClass: 'border-l-4 border-status-healthy',
+    iconClass: 'text-status-healthy',
+    icon: <CheckIcon size={22} />,
   },
 ];
 
-const HealthStatusBar: React.FC<{
+const OverallHealthCard: React.FC<{ overallHealth: number | null }> = ({ overallHealth }) => (
+  <section className="rounded-xl border border-outline-variant bg-surface p-6 shadow-sm">
+    <h2 className="font-headline-sm text-headline-sm uppercase text-on-surface-variant">Overall health</h2>
+    <div className="mt-2 flex items-baseline gap-2">
+      <span className="font-display-hero text-display-hero text-text-heading">{overallHealth ?? 'N/A'}</span>
+      {overallHealth !== null && <span className="font-headline-lg text-headline-lg text-outline">/100</span>}
+    </div>
+    <p className="mt-2 font-body-sm text-body-sm text-on-surface-variant">
+      Score based on schedule, delivery, scope, capacity, and dependency health.
+    </p>
+  </section>
+);
+
+const StatCountCard: React.FC<{
   label: string;
-  dotClass: string;
-  barClass: string;
   count: number;
-  total: number;
-  tooltip: string;
-}> = ({ label, dotClass, barClass, count, total, tooltip }) => (
-  <div className="group relative">
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-2">
-        <div className={`h-3 w-3 rounded-full ${dotClass}`} />
-        <span className="font-label-bold text-label-bold text-text-heading">{label}</span>
-      </div>
-      <span className="font-data-mono text-data-mono font-bold text-text-heading">{count}</span>
+  borderClass: string;
+  iconClass: string;
+  icon: React.ReactNode;
+}> = ({ label, count, borderClass, iconClass, icon }) => (
+  <section
+    className={`flex items-center justify-between rounded-xl border border-outline-variant bg-surface p-6 shadow-sm ${borderClass}`}
+  >
+    <div>
+      <h2 className="font-headline-sm text-headline-sm uppercase text-on-surface-variant">{label}</h2>
+      <span className="font-display-hero text-display-hero text-text-heading">{count}</span>
     </div>
-    <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-surface-container">
-      <div
-        className={`h-full ${barClass}`}
-        style={{ width: total === 0 ? '0%' : `${(count / total) * 100}%` }}
-      />
-    </div>
-    <div className="pointer-events-none absolute left-0 top-full z-20 mt-2 w-48 rounded bg-inverse-surface px-3 py-2 font-body-sm text-body-sm text-inverse-on-surface opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
-      {tooltip}
-    </div>
-  </div>
+    <span className={iconClass}>{icon}</span>
+  </section>
 );
 
 interface DashboardProps {
@@ -185,7 +186,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
   isRerunning,
 }) => {
   const { overallHealth, statusCounts, projects, topAttention, alerts } = summary;
-  const scoredTotal = statusCounts.critical + statusCounts.atRisk + statusCounts.healthy;
 
   return (
     <section className="flex flex-col gap-gutter">
@@ -204,44 +204,18 @@ export const Dashboard: React.FC<DashboardProps> = ({
         )}
       </div>
 
-      <div className="grid grid-cols-1 gap-gutter lg:grid-cols-12">
-        <section className="relative flex flex-col items-center gap-8 overflow-hidden rounded-xl border border-outline-variant bg-surface p-6 shadow-sm md:flex-row md:items-center md:justify-between lg:col-span-8">
-          <div
-            className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary-fixed/30 opacity-50 blur-3xl"
-            aria-hidden="true"
+      <div className="grid grid-cols-1 gap-gutter sm:grid-cols-2 lg:grid-cols-4">
+        <OverallHealthCard overallHealth={overallHealth} />
+        {STATUS_COUNT_CARDS.map((card) => (
+          <StatCountCard
+            key={card.key}
+            label={card.label}
+            count={statusCounts[card.key]}
+            borderClass={card.borderClass}
+            iconClass={card.iconClass}
+            icon={card.icon}
           />
-          <div className="z-10 flex flex-col items-center md:items-start">
-            <h2 className="mb-stack-sm font-headline-sm text-headline-sm uppercase text-text-heading">
-              Overall Portfolio Health
-            </h2>
-            <div className="flex items-baseline gap-2">
-              <span className="font-display-hero text-display-hero text-text-heading">
-                {overallHealth ?? 'N/A'}
-              </span>
-              {overallHealth !== null && (
-                <span className="font-headline-lg text-headline-lg text-outline">/100</span>
-              )}
-            </div>
-            <p className="mt-2 rounded bg-surface-container-high px-2 py-1 font-body-sm text-body-sm text-on-surface-variant">
-              Score based on schedule, delivery, scope, capacity, and dependency health.
-            </p>
-          </div>
-          <div className="z-10 w-full flex-1 md:w-auto">
-            <div className="flex w-full flex-col gap-3">
-              {HEALTH_BAR_ROWS.map((row) => (
-                <HealthStatusBar
-                  key={row.key}
-                  label={row.label}
-                  dotClass={row.dotClass}
-                  barClass={row.barClass}
-                  count={statusCounts[row.key]}
-                  total={scoredTotal}
-                  tooltip={row.tooltip}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
+        ))}
       </div>
 
       <section>

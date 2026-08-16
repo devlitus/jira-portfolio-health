@@ -72,8 +72,8 @@ Objetivo: pasar del hero de una sola card + barras de status a las 4 cards del p
 
 ### Tarea C.1 — Hero de 4 cards
 
-- [ ] Sustituir la card `lg:col-span-8` actual por una fila de 4 cards (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-4` o similar): "Overall health" (score grande + `/100`, sin sparkline — Adaptación 8), "Critical" (número + icono, borde-acento izquierdo rojo), "At Risk" (ámbar), "Healthy" (verde) — reutilizando `statusCounts` real.
-- [ ] Quitar `HealthStatusBar`/`HEALTH_BAR_ROWS` (las barras proporcionales del diseño anterior no están en el prototipo; las 3 cards de conteo las reemplazan).
+- [x] Sustituir la card `lg:col-span-8` actual por una fila de 4 cards (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-4` o similar): "Overall health" (score grande + `/100`, sin sparkline — Adaptación 8), "Critical" (número + icono, borde-acento izquierdo rojo), "At Risk" (ámbar), "Healthy" (verde) — reutilizando `statusCounts` real.
+- [x] Quitar `HealthStatusBar`/`HEALTH_BAR_ROWS` (las barras proporcionales del diseño anterior no están en el prototipo; las 3 cards de conteo las reemplazan).
 - **DoD:** los 4 números mostrados coinciden con `summary` sin datos hardcodeados; `overallHealth === null` sigue mostrando `N/A` en vez de romper el layout.
 
 ### Tarea C.2 — "Today's Attention" (dentro de Dashboard, ya no en `AttentionQueue.tsx` separado)
