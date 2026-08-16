@@ -172,7 +172,7 @@ Objetivo: alinear `ProjectSelector.tsx` y los estados `analyzing`/`error` de `in
 
 ### Tarea F.2 — Estados `analyzing`/`error` bajo el nuevo shell
 
-- [ ] Revisar que ambos estados rendericen correctamente sin el sidebar (ya no hay `lg:ml-64`/`pt-16` que compensar — Tarea B.1); ajustar solo si el layout se ve descentrado.
+- [x] Revisar que ambos estados rendericen correctamente sin el sidebar (ya no hay `lg:ml-64`/`pt-16` que compensar — Tarea B.1); ajustar solo si el layout se ve descentrado.
 - **DoD:** `role="alert"` en el estado de error se conserva; `ANALYSIS_STEPS` se sigue mostrando igual que hoy (fuera de alcance, Adaptación 9 aplica solo a `loading`, no a `analyzing`).
 
 ---
