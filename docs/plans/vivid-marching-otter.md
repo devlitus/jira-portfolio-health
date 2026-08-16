@@ -181,8 +181,8 @@ Objetivo: alinear `ProjectSelector.tsx` y los estados `analyzing`/`error` de `in
 
 ### Tarea G.1 — Build y checks estáticos
 
-- [ ] `npm run build` (Tailwind + esbuild) sin errores.
-- [ ] `npm run lint` y `npm test` (incluye el nuevo `recommendedActions.test.ts` de la Tarea D.1) sin romper nada.
+- [x] `npm run build` (Tailwind + esbuild) sin errores.
+- [x] `npm run lint` y `npm test` (incluye el nuevo `recommendedActions.test.ts` de la Tarea D.1) sin romper nada.
 - **DoD:** los 3 comandos pasan en verde.
 
 ### Tarea G.2 — Chequeo visual contra el prototipo
