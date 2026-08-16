@@ -11,7 +11,8 @@
     "watch:css": "tailwindcss -i src/frontend/styles.css -o static/main/styles.css --watch",
     "watch": "concurrently -n js,css \"npm:watch:js\" \"npm:watch:css\"",
     "lint": "eslint src/**/*.{ts,tsx}",
-    "test": "jest"
+    "test": "jest",
+    "seed:demo": "node scripts/seed-demo-data.mjs"
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.3.3",

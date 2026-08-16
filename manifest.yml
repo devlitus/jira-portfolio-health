@@ -3,6 +3,7 @@ modules:
     - key: jira-portfolio-health-global-page-hello-world
       resource: main
       title: jira-portfolio-health
+      layout: blank
       resolver:
         function: resolver
   scheduledTrigger:
