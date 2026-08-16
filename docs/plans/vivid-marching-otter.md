@@ -166,8 +166,8 @@ Objetivo: alinear `ProjectSelector.tsx` y los estados `analyzing`/`error` de `in
 
 ### Tarea F.1 — `ProjectSelector.tsx`
 
-- [ ] Actualizar subtítulo a la copy del prototipo: "Select the projects you want to monitor. That's it — no baselines, no custom fields. You can add more projects later." (reemplaza "Select projects to monitor").
-- [ ] Añadir contador "`{selectedKeys.size} of {projects.length} selected`" junto al botón "Start analysis" (dato real, no existe hoy).
+- [x] Actualizar subtítulo a la copy del prototipo: "Select the projects you want to monitor. That's it — no baselines, no custom fields. You can add more projects later." (reemplaza "Select projects to monitor").
+- [x] Añadir contador "`{selectedKeys.size} of {projects.length} selected`" junto al botón "Start analysis" (dato real, no existe hoy).
 - **DoD:** `selectedKeys.size === 0` sigue deshabilitando "Start analysis"; el contador se actualiza al togglear checkboxes.
 
 ### Tarea F.2 — Estados `analyzing`/`error` bajo el nuevo shell

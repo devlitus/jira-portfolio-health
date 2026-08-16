@@ -24,7 +24,10 @@ export const ProjectSelector: React.FC<ProjectSelectorProps> = ({
     <section className="flex flex-col gap-gutter">
       <div>
         <h1 className="font-headline-lg text-headline-lg text-text-heading">Welcome to Portfolio Health</h1>
-        <p className="mt-1 font-body-md text-body-md text-on-surface-variant">Select projects to monitor</p>
+        <p className="mt-1 font-body-md text-body-md text-on-surface-variant">
+          Select the projects you want to monitor. That&apos;s it — no baselines, no custom fields. You can add more
+          projects later.
+        </p>
       </div>
 
       {projects.length === 0 ? (
@@ -72,13 +75,18 @@ export const ProjectSelector: React.FC<ProjectSelectorProps> = ({
             </ul>
           </section>
 
-          <button
-            type="submit"
-            disabled={selectedKeys.size === 0}
-            className="self-start rounded bg-primary-container px-6 py-2 font-label-bold text-label-bold text-on-primary transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            Start analysis
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="submit"
+              disabled={selectedKeys.size === 0}
+              className="rounded bg-primary-container px-6 py-2 font-label-bold text-label-bold text-on-primary transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Start analysis
+            </button>
+            <span className="font-body-sm text-body-sm text-on-surface-variant">
+              {selectedKeys.size} of {projects.length} selected
+            </span>
+          </div>
         </form>
       )}
     </section>
