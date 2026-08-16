@@ -102,11 +102,11 @@ Objetivo: nueva pantalla top-level que agrega recomendaciones de todos los proye
 
 ### Tarea D.1 — Agregación pura en frontend
 
-- [ ] Crear `src/frontend/lib/recommendedActions.ts`: función pura `buildRecommendedActions(details: ProjectDetailData[]): RecommendedActionItem[]` que, por cada `ProjectDetail`, mapea `recommendations` a `{ projectKey, projectName, code, message, severity, ruleLabel }`:
+- [x] Crear `src/frontend/lib/recommendedActions.ts`: función pura `buildRecommendedActions(details: ProjectDetailData[]): RecommendedActionItem[]` que, por cada `ProjectDetail`, mapea `recommendations` a `{ projectKey, projectName, code, message, severity, ruleLabel }`:
   - `severity`: busca el `HealthFactor` con el mismo `code` en `detail.factors` y aplica el umbral de la Adaptación 4 (`|impact| >= 40` → `CRITICAL`, `>= 20` → `AT_RISK`, si no → `HEALTHY`); si no hay factor asociado, `HEALTHY` (nunca inventar severidad alta sin dato).
   - `ruleLabel`: mapa estático de 4 entradas (Adaptación 3) — `SCOPE_GROWTH → 'SCOPE GROWTH > 20%'`, `BLOCKED_ISSUES → 'BLOCKED ISSUES ≥ 3'`, `OVERDUE_ISSUES → 'OVERDUE RATIO > 0.20'`, `CAPACITY_OVERLOAD → 'WORKLOAD SIGNAL = HIGH'`.
   - Orden final: por proyecto ascendente en `healthScore` (peor primero, `null` al final), preservando dentro de cada proyecto el orden ya devuelto por el backend (por impacto).
-- [ ] Test `__tests__/recommendedActions.test.ts`: cubre severidad por los 3 umbrales, `ruleLabel` de las 4 reglas, orden entre proyectos, y el caso de 0 recomendaciones globales.
+- [x] Test `__tests__/recommendedActions.test.ts`: cubre severidad por los 3 umbrales, `ruleLabel` de las 4 reglas, orden entre proyectos, y el caso de 0 recomendaciones globales.
 - **DoD:** `npm test` verde; la función no llama a `invoke` ni toca KVS (pura, mismo criterio que `src/health/dashboard.ts`).
 
 ### Tarea D.2 — Carga en `index.tsx`
