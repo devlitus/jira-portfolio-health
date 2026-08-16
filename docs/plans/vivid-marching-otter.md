@@ -91,7 +91,7 @@ Objetivo: pasar del hero de una sola card + barras de status a las 4 cards del p
 
 ### Tarea C.4 — "Recent Alerts" (se conserva, Adaptación 7)
 
-- [ ] Sin cambios funcionales; solo ajustar espaciado/tipografía si hace falta para que combine con el resto de cards re-estilizadas en esta fase.
+- [x] Sin cambios funcionales; solo ajustar espaciado/tipografía si hace falta para que combine con el resto de cards re-estilizadas en esta fase.
 - **DoD:** `alerts.length === 0` sigue mostrando el estado vacío existente.
 
 ---
