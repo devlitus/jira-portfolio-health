@@ -58,10 +58,10 @@ Objetivo: reemplazar el sidebar de `AppShell.tsx` por la barra de tabs del proto
 
 ### Tarea B.2 — Cablear `recommended` en `index.tsx`
 
-- [ ] Añadir `'recommended'` a `Status`; nueva rama en `renderContent()` que monta `RecommendedActions` (Fase D) cuando `status === 'recommended'`.
-- [ ] `AppShellView` derivado: `status === 'recommended' ? 'recommended' : status === 'setup' ? 'configuration' : 'dashboard'` (detail sigue resolviendo a `'dashboard'`, ver Tarea B.1).
-- [ ] Nuevo handler `onNavigateRecommended` en `AppShell`, gateado igual que `onNavigateDashboard` (solo navega si `dashboard` ya existe — Adaptación 4 del plan anterior, mismo motivo: no tiene sentido mostrar recomendaciones sin análisis corrido).
-- [ ] Renombrar el label de nav "Configuration" → "Setup" (texto del prototipo); el handler sigue siendo el mismo `setStatus('setup')`.
+- [x] Añadir `'recommended'` a `Status`; nueva rama en `renderContent()` que monta `RecommendedActions` (Fase D) cuando `status === 'recommended'`.
+- [x] `AppShellView` derivado: `status === 'recommended' ? 'recommended' : status === 'setup' ? 'configuration' : 'dashboard'` (detail sigue resolviendo a `'dashboard'`, ver Tarea B.1).
+- [x] Nuevo handler `onNavigateRecommended` en `AppShell`, gateado igual que `onNavigateDashboard` (solo navega si `dashboard` ya existe — Adaptación 4 del plan anterior, mismo motivo: no tiene sentido mostrar recomendaciones sin análisis corrido).
+- [x] Renombrar el label de nav "Configuration" → "Setup" (texto del prototipo); el handler sigue siendo el mismo `setStatus('setup')`.
 - **DoD:** navegar por los 4 estados (`ready`/`recommended`/`setup`/`detail`) no rompe las llamadas `invoke` existentes; `npm run lint` pasa.
 
 ---

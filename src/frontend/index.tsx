@@ -32,7 +32,7 @@ const ANALYSIS_STEPS = [
   'Saving baseline',
 ];
 
-type Status = 'loading' | 'setup' | 'analyzing' | 'ready' | 'detail' | 'error';
+type Status = 'loading' | 'setup' | 'analyzing' | 'ready' | 'detail' | 'recommended' | 'error';
 
 // Spinner compartido entre 'loading' y 'analyzing' (Tarea F.2). Definido aquí
 // en vez de en components/ui/ porque solo se usa en este archivo (ver DoD:
@@ -200,6 +200,19 @@ const App: React.FC = () => {
       return <ProjectDetail detail={projectDetail} onBack={() => setStatus('ready')} />;
     }
 
+    // Placeholder hasta la Fase D (Tarea D.2/D.3), que agrega la carga de
+    // `recommendedActions` y monta el componente `RecommendedActions` real.
+    if (status === 'recommended') {
+      return (
+        <section className="rounded-xl border border-outline-variant bg-surface p-6 shadow-sm">
+          <h1 className="font-headline-lg text-headline-lg text-text-heading">Recommended Actions</h1>
+          <p className="mt-2 font-body-md text-body-md text-on-surface-variant">
+            Coming soon — aggregated recommendations across your monitored projects.
+          </p>
+        </section>
+      );
+    }
+
     if (status === 'ready' && dashboard) {
       return (
         <>
@@ -234,11 +247,12 @@ const App: React.FC = () => {
     );
   }
 
-  // Adaptación 4: "Dashboard" solo navega si ya hay un análisis (`dashboard`
-  // existe); "Configuration" reusa la lógica del antiguo botón "Edit
-  // selection" (setStatus('setup') sin condiciones).
+  // Adaptación 4: "Dashboard" y "Recommended Actions" solo navegan si ya hay
+  // un análisis (`dashboard` existe); "Setup" reusa la lógica del antiguo
+  // botón "Edit selection" (setStatus('setup') sin condiciones). `detail` no
+  // tiene tab propio: sigue resolviendo a 'dashboard' (Tarea B.1).
   const appShellView: AppShellView =
-    status === 'detail' ? 'detail' : status === 'setup' ? 'configuration' : 'dashboard';
+    status === 'recommended' ? 'recommended' : status === 'setup' ? 'configuration' : 'dashboard';
 
   return (
     <AppShell
@@ -248,8 +262,12 @@ const App: React.FC = () => {
           setStatus('ready');
         }
       }}
+      onNavigateRecommended={() => {
+        if (dashboard) {
+          setStatus('recommended');
+        }
+      }}
       onNavigateConfiguration={() => setStatus('setup')}
-      detailProjectName={status === 'detail' ? projectDetail?.projectName : undefined}
     >
       {renderContent()}
     </AppShell>
